@@ -1,0 +1,77 @@
+version: '2'
+services:
+
+  mysql:
+    image: mysql
+    ports:
+    - "3306:3306"
+    environment:
+    - MYSQL_ROOT_PASSWORD=root
+    volumes:
+    - ./database/init:/docker-entrypoint-initdb.d
+
+#  service:
+#    image: barkeep/barkeep-service
+#    ports:
+#    - "8080:8080"
+#    links:
+#    - mysql
+#
+#  cassandra:
+#    image: cassandra
+#    ports:
+#    - "7000:7000"
+#    - "7001:7001"
+#    - "7199:7199"
+#    - "9042:9042"
+#    - "9160:9160"
+#
+#  eureka:
+#    image: barkeep/eureka-service
+#    ports:
+#    - "8761"
+#
+#  zuul:
+#    image: barkeep/zuul-service
+#    environment:
+#    - eureka.host=eureka
+#    links:
+#    - eureka
+#    - gateway
+#    - ingredients
+#    - recipes
+#    ports:
+#    - "8080:8080"
+#
+#  gateway:
+#    image: barkeep/gateway-service
+#    environment:
+#    - eureka.host=eureka
+#    links:
+#    - eureka
+#    - ingredients
+#    - recipes
+#    ports:
+#    - "8080"
+#
+#  ingredients:
+#    image: barkeep/ingredient-service
+#    environment:
+#    - cassandra.host=cassandra
+#    - eureka.host=eureka
+#    links:
+#    - cassandra
+#    - eureka
+#    ports:
+#    - "8080"
+#
+#  recipes:
+#    image: barkeep/recipe-service
+#    environment:
+#    - cassandra.host=cassandra
+#    - eureka.host=eureka
+#    links:
+#    - cassandra
+#    - eureka
+#    ports:
+#    - "8080"

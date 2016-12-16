@@ -15,7 +15,7 @@ public interface User extends HasId {
   @JsonView(User.class)
   String getUsername();
 
-  char[] getPassword();
+  String getPassword();
 
   @JsonView(User.class)
   String getDisplayName();

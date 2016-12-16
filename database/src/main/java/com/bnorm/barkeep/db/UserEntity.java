@@ -1,19 +1,33 @@
 package com.bnorm.barkeep.db;
 
-import com.bnorm.barkeep.model.Bar;
-import com.bnorm.barkeep.model.Book;
-import com.bnorm.barkeep.model.User;
-
-import javax.persistence.*;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.bnorm.barkeep.model.Bar;
+import com.bnorm.barkeep.model.Book;
+import com.bnorm.barkeep.model.User;
+
 @Entity
 @Table(name = "tblUsers")
+@NamedQueries({@NamedQuery(name = "UserEntity.findByUsername",
+                           query = "SELECT u FROM UserEntity u where u.username = :username"),
+               @NamedQuery(name = "UserEntity.findByEmail",
+                           query = "SELECT u FROM UserEntity u where u.email = :email")})
 public class UserEntity implements User {
 
   @Id
@@ -25,7 +39,7 @@ public class UserEntity implements User {
   private String username;
 
   @Column(name = "password", nullable = false)
-  private char[] password;
+  private String password;
 
   @Column(name = "displayName", nullable = false)
   private String displayName;
@@ -65,11 +79,11 @@ public class UserEntity implements User {
   }
 
   @Override
-  public char[] getPassword() {
+  public String getPassword() {
     return password;
   }
 
-  public void setPassword(char[] password) {
+  public void setPassword(String password) {
     this.password = password;
   }
 

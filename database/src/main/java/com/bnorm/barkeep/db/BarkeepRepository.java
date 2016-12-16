@@ -1,9 +1,10 @@
 package com.bnorm.barkeep.db;
 
-import javax.persistence.EntityManager;
-
 import java.util.List;
 import java.util.Optional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 public class BarkeepRepository {
 
@@ -39,7 +40,13 @@ public class BarkeepRepository {
     return entityManager.find(UserEntity.class, id);
   }
 
-  public UserEntity createUser(String username, char[] password, String displayName, String email) {
+  public UserEntity findUserByUsername(String username) {
+    TypedQuery<UserEntity> query = entityManager.createNamedQuery("UserEntity.findByUsername", UserEntity.class);
+    List<UserEntity> results = query.setParameter("username", username).getResultList();
+    return results.isEmpty() ? null : results.get(0);
+  }
+
+  public UserEntity createUser(String username, String password, String displayName, String email) {
     UserEntity user = new UserEntity();
     user.setUsername(username);
     user.setPassword(password);

@@ -2,13 +2,8 @@ package com.bnorm.barkeep.service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,16 +22,8 @@ public class BarkeepService {
 
   private final BarkeepRepository repository;
 
-  public BarkeepService(@Value("${barkeep.db.host:192.168.99.100}") String db) {
-    Properties properties = new Properties();
-    properties.put("hibernate.connection.url", "jdbc:mysql://" + db + "/barkeep");
-    properties.put("hibernate.connection.username", "root");
-    properties.put("hibernate.connection.password", "root");
-
-    EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("com.bnorm.barkeep.jpa",
-                                                                                       properties);
-    EntityManager entityManager = entityManagerFactory.createEntityManager();
-    this.repository = new BarkeepRepository(entityManager);
+  public BarkeepService(@Autowired BarkeepRepository repository) {
+    this.repository = repository;
   }
 
   @JsonView(Bar.class)

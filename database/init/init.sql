@@ -92,10 +92,10 @@ CREATE TABLE tblRecipes
 CREATE TABLE tblUsers
 (
   id          INT(10) UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  username    VARCHAR(255)                 NOT NULL,
+  username    VARCHAR(255) UNIQUE          NOT NULL,
   password    VARCHAR(255)                 NOT NULL,
   displayName VARCHAR(255)                 NOT NULL,
-  email       VARCHAR(255)                 NOT NULL,
+  email       VARCHAR(255) UNIQUE          NOT NULL,
   createTime  TIMESTAMP                             DEFAULT CURRENT_TIMESTAMP,
   modifyTime  TIMESTAMP                             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

@@ -1,10 +1,10 @@
 package com.bnorm.barkeep.model;
 
+import java.time.Instant;
+import java.util.Collection;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
-
-import java.time.Instant;
-import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public interface User extends HasId {
@@ -28,8 +28,8 @@ public interface User extends HasId {
   Instant getModifyTime();
 
   @JsonView(User.class)
-  List<Book> getBooks();
+  Collection<Book> getBooks();
 
   @JsonView(User.class)
-  List<Bar> getBars();
+  Collection<Bar> getBars();
 }

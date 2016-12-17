@@ -35,7 +35,7 @@ CREATE TABLE lkpBarsIngredients
 CREATE TABLE tblBars
 (
   id          BIGINT(20) UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  user        INT(10) UNSIGNED                NOT NULL,
+  owner       INT(10) UNSIGNED                NOT NULL,
   title       VARCHAR(255)                    NOT NULL,
   description TEXT,
   createTime  TIMESTAMP                                DEFAULT CURRENT_TIMESTAMP,
@@ -46,7 +46,7 @@ CREATE TABLE tblBars
 CREATE TABLE tblBooks
 (
   id          BIGINT(20) UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  user        INT(10) UNSIGNED                NOT NULL,
+  owner       INT(10) UNSIGNED                NOT NULL,
   title       VARCHAR(255)                    NOT NULL,
   description TEXT,
   active      TINYINT(1) DEFAULT '1'          NOT NULL,
@@ -155,22 +155,6 @@ CREATE INDEX FK_lkpBarsIngredients_tblBars
   ON lkpBarsIngredients (bar);
 CREATE INDEX FK_lkpBarsIngredients_tblIngredients
   ON lkpBarsIngredients (ingredient);
-
-
-ALTER TABLE tblBars
-  ADD FOREIGN KEY (user) REFERENCES tblUsers (id)
-  ON DELETE CASCADE
-  ON UPDATE CASCADE;
-CREATE INDEX FK_tblBars_tblUsers
-  ON tblBars (user);
-
-
-ALTER TABLE tblBooks
-  ADD FOREIGN KEY (user) REFERENCES tblUsers (id)
-  ON DELETE CASCADE
-  ON UPDATE CASCADE;
-CREATE INDEX FK_tblBooks_tblUsers
-  ON tblBooks (user);
 
 
 ALTER TABLE tblIngredients

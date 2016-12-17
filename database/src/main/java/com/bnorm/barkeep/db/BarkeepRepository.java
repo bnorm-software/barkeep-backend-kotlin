@@ -1,10 +1,14 @@
 package com.bnorm.barkeep.db;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+
+import com.bnorm.barkeep.model.Bar;
+import com.bnorm.barkeep.model.Book;
 
 public class BarkeepRepository {
 
@@ -22,7 +26,7 @@ public class BarkeepRepository {
     return entity;
   }
 
-  private <E> E update(E entity) {
+  private <E> E save(E entity) {
     entityManager.getTransaction().begin();
     entityManager.merge(entity);
     entityManager.getTransaction().commit();
@@ -56,8 +60,8 @@ public class BarkeepRepository {
     return create(user);
   }
 
-  public UserEntity updateUser(UserEntity user) {
-    return update(user);
+  public UserEntity saveUser(UserEntity user) {
+    return save(user);
   }
 
   public void deleteUser(UserEntity user) {
@@ -65,20 +69,36 @@ public class BarkeepRepository {
   }
 
 
+  public Collection<Book> getBooks(long userId) {
+    return getUser(userId).getBooks();
+  }
+
+  public Book getBook(long userId, long bookId) {
+    return getUser(userId).getBookMap().get(bookId);
+  }
+
   public BookEntity getBook(long id) {
     return entityManager.find(BookEntity.class, id);
   }
 
   public BookEntity createBook(UserEntity user, String title) {
-    BookEntity book = new BookEntity();
-    book.setUser(user);
-    book.setTitle(title);
+    entityManager.getTransaction().begin();
 
-    return create(book);
+    BookEntity book = new BookEntity();
+    book.setTitle(title);
+    book.setOwner(user);
+    entityManager.persist(book);
+
+    user.addBook(book);
+    entityManager.merge(user);
+
+    entityManager.getTransaction().commit();
+
+    return book;
   }
 
-  public BookEntity updateBook(BookEntity book) {
-    return update(book);
+  public BookEntity saveBook(BookEntity book) {
+    return save(book);
   }
 
   public void deleteBook(BookEntity book) {
@@ -86,20 +106,36 @@ public class BarkeepRepository {
   }
 
 
+  public Collection<Bar> getBars(long userId) {
+    return getUser(userId).getBars();
+  }
+
+  public Bar getBar(long userId, long barId) {
+    return getUser(userId).getBarMap().get(barId);
+  }
+
   public BarEntity getBar(long id) {
     return entityManager.find(BarEntity.class, id);
   }
 
   public BarEntity createBar(UserEntity user, String title) {
-    BarEntity bar = new BarEntity();
-    bar.setUser(user);
-    bar.setTitle(title);
+    entityManager.getTransaction().begin();
 
-    return create(bar);
+    BarEntity bar = new BarEntity();
+    bar.setOwner(user);
+    bar.setTitle(title);
+    entityManager.persist(bar);
+
+    user.addBar(bar);
+    entityManager.merge(user);
+
+    entityManager.getTransaction().commit();
+
+    return bar;
   }
 
-  public BarEntity updateBar(BarEntity bar) {
-    return update(bar);
+  public BarEntity saveBar(BarEntity bar) {
+    return save(bar);
   }
 
   public void deleteBar(BarEntity bar) {
@@ -117,26 +153,23 @@ public class BarkeepRepository {
     RecipeEntity recipe = new RecipeEntity();
     recipe.setTitle(title);
     recipe.setComponents(recipeComponents);
-
     entityManager.persist(recipe);
 
     BookRecipeEntityKey key = new BookRecipeEntityKey();
     key.setBook(book);
     key.setRecipe(recipe);
-
     BookRecipeEntity bookRecipe = new BookRecipeEntity();
     bookRecipe.setKey(key);
 
     book.addRecipe(bookRecipe);
-
     entityManager.merge(book);
 
     entityManager.getTransaction().commit();
     return recipe;
   }
 
-  public RecipeEntity updateRecipe(RecipeEntity recipe) {
-    return update(recipe);
+  public RecipeEntity saveRecipe(RecipeEntity recipe) {
+    return save(recipe);
   }
 
   public void deleteRecipe(RecipeEntity recipe) {
@@ -164,8 +197,8 @@ public class BarkeepRepository {
     return create(ingredient);
   }
 
-  public IngredientEntity updateIngredient(IngredientEntity ingredient) {
-    return update(ingredient);
+  public IngredientEntity saveIngredient(IngredientEntity ingredient) {
+    return save(ingredient);
   }
 
   public void deleteIngredient(IngredientEntity ingredient) {

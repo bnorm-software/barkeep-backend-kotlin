@@ -21,8 +21,8 @@ public class BarEntity implements Bar {
   private long id;
 
   @ManyToOne
-  @JoinColumn(name = "user", referencedColumnName = "id", nullable = false)
-  private UserEntity user;
+  @JoinColumn(name = "owner", referencedColumnName = "id", nullable = false)
+  private UserEntity owner;
 
   @Column(name = "title", nullable = false)
   private String title;
@@ -39,6 +39,12 @@ public class BarEntity implements Bar {
   private Date modifyTime;
 
   @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "lkpUsersBars",
+             joinColumns = @JoinColumn(name = "bar"),
+             inverseJoinColumns = @JoinColumn(name = "user"))
+  private List<UserEntity> users;
+
+  @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(name = "lkpBarsIngredients",
              joinColumns = @JoinColumn(name = "bar"),
              inverseJoinColumns = @JoinColumn(name = "ingredient"))
@@ -52,8 +58,8 @@ public class BarEntity implements Bar {
     return id;
   }
 
-  public void setUser(UserEntity user) {
-    this.user = user;
+  public void setOwner(UserEntity owner) {
+    this.owner = owner;
   }
 
   @Override

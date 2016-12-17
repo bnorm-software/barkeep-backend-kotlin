@@ -1,19 +1,23 @@
 package com.bnorm.barkeep.db;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.MapKey;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -55,11 +59,19 @@ public class UserEntity implements User {
   @Column(name = "modifyTime", updatable = false)
   private Date modifyTime;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-  private List<BookEntity> books = new ArrayList<>();
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "lkpUsersBooks",
+             joinColumns = @JoinColumn(name = "user"),
+             inverseJoinColumns = @JoinColumn(name = "book"))
+  @MapKey(name = "id")
+  private Map<Long, BookEntity> books = new LinkedHashMap<>();
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-  private List<BarEntity> bars = new ArrayList<>();
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "lkpUsersBars",
+             joinColumns = @JoinColumn(name = "user"),
+             inverseJoinColumns = @JoinColumn(name = "bar"))
+  @MapKey(name = "id")
+  private Map<Long, BarEntity> bars = new LinkedHashMap<>();
 
   public UserEntity() {
   }
@@ -115,13 +127,29 @@ public class UserEntity implements User {
     return modifyTime.toInstant();
   }
 
-  @Override
-  public List<Book> getBooks() {
-    return Collections.unmodifiableList(books);
+  public Map<Long, BookEntity> getBookMap() {
+    return books;
+  }
+
+  public void addBook(BookEntity bookEntity) {
+    books.put(bookEntity.getId(), bookEntity);
+  }
+
+  public Map<Long, BarEntity> getBarMap() {
+    return bars;
+  }
+
+  public void addBar(BarEntity barEntity) {
+    bars.put(barEntity.getId(), barEntity);
   }
 
   @Override
-  public List<Bar> getBars() {
-    return Collections.unmodifiableList(bars);
+  public Collection<Book> getBooks() {
+    return Collections.unmodifiableCollection(books.values());
+  }
+
+  @Override
+  public Collection<Bar> getBars() {
+    return Collections.unmodifiableCollection(bars.values());
   }
 }

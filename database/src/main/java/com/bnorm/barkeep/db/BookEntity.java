@@ -1,18 +1,37 @@
 package com.bnorm.barkeep.db;
 
-import com.bnorm.barkeep.model.Book;
-import com.bnorm.barkeep.model.Recipe;
-
-import javax.persistence.*;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.bnorm.barkeep.model.Book;
+import com.bnorm.barkeep.model.Recipe;
 
 @Entity
 @Table(name = "tblBooks")
+//@NamedQueries({@NamedQuery(name = "BookEntity.findByUser", //
+//                           query = "SELECT b FROM BookEntity b " //
+//                                   + "INNER JOIN lkpUsersBooks fk ON fk.book = b.id " //
+//                                   + "INNER JOIN UserEntity u ON u.id = fk.user " //
+//                                   + "where u.id = :id")})
 public class BookEntity implements Book {
 
   @Id
@@ -21,8 +40,8 @@ public class BookEntity implements Book {
   private long id;
 
   @ManyToOne
-  @JoinColumn(name = "user", referencedColumnName = "id", nullable = false)
-  private UserEntity user;
+  @JoinColumn(name = "owner", referencedColumnName = "id", nullable = false)
+  private UserEntity owner;
 
   @Column(name = "title", nullable = false)
   private String title;
@@ -41,6 +60,12 @@ public class BookEntity implements Book {
   @Column(name = "modifyTime", updatable = false)
   private Date modifyTime;
 
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "lkpUsersBooks",
+             joinColumns = @JoinColumn(name = "book"),
+             inverseJoinColumns = @JoinColumn(name = "user"))
+  private List<UserEntity> users;
+
   @OneToMany(mappedBy = "key.book", cascade = CascadeType.ALL)
   @MapKey(name = "number")
   private Map<Long, BookRecipeEntity> bookRecipes = new LinkedHashMap<>();
@@ -53,8 +78,8 @@ public class BookEntity implements Book {
     return id;
   }
 
-  public void setUser(UserEntity user) {
-    this.user = user;
+  public void setOwner(UserEntity owner) {
+    this.owner = owner;
   }
 
   @Override
@@ -91,6 +116,10 @@ public class BookEntity implements Book {
   @Override
   public Instant getModifyTime() {
     return modifyTime.toInstant();
+  }
+
+  public List<UserEntity> getUsers() {
+    return users;
   }
 
   @Override

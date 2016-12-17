@@ -3,9 +3,8 @@ package com.bnorm.barkeep.db;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,17 +15,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKey;
-import javax.persistence.OneToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.SortNatural;
 
 import com.bnorm.barkeep.model.Book;
 import com.bnorm.barkeep.model.Recipe;
 
 @Entity
 @Table(name = "tblBooks")
+@NamedQueries({@NamedQuery(name = "BookEntity.findAll", query = "SELECT b FROM BookEntity b")})
 //@NamedQueries({@NamedQuery(name = "BookEntity.findByUser", //
 //                           query = "SELECT b FROM BookEntity b " //
 //                                   + "INNER JOIN lkpUsersBooks fk ON fk.book = b.id " //
@@ -64,18 +66,27 @@ public class BookEntity implements Book {
   @JoinTable(name = "lkpUsersBooks",
              joinColumns = @JoinColumn(name = "book"),
              inverseJoinColumns = @JoinColumn(name = "user"))
-  private List<UserEntity> users;
+  @SortNatural
+  private Set<UserEntity> users = new TreeSet<>();
 
-  @OneToMany(mappedBy = "key.book", cascade = CascadeType.ALL)
-  @MapKey(name = "number")
-  private Map<Long, BookRecipeEntity> bookRecipes = new LinkedHashMap<>();
+  @ManyToMany(cascade = CascadeType.ALL)
+  @JoinTable(name = "lkpBooksRecipes",
+             joinColumns = @JoinColumn(name = "book"),
+             inverseJoinColumns = @JoinColumn(name = "recipe"))
+  @SortNatural
+  private Set<RecipeEntity> recipes = new TreeSet<>();
 
   public BookEntity() {
   }
 
   @Override
-  public long getId() {
+  public Long getId() {
     return id;
+  }
+
+  @Override
+  public UserEntity getOwner() {
+    return owner;
   }
 
   public void setOwner(UserEntity owner) {
@@ -108,27 +119,20 @@ public class BookEntity implements Book {
     this.description = description;
   }
 
-  @Override
   public Instant getCreateTime() {
     return createTime.toInstant();
   }
 
-  @Override
   public Instant getModifyTime() {
     return modifyTime.toInstant();
   }
 
-  public List<UserEntity> getUsers() {
-    return users;
-  }
-
   @Override
-  public Map<Long, Recipe> getRecipes() {
-    return Collections.unmodifiableMap(bookRecipes);
+  public Set<Recipe> getRecipes() {
+    return Collections.unmodifiableSet(recipes);
   }
 
-  public void addRecipe(BookRecipeEntity recipe) {
-    recipe.setNumber(bookRecipes.size() + 1);
-    bookRecipes.put(recipe.getNumber(), recipe);
+  public void addRecipe(RecipeEntity recipe) {
+    recipes.add(recipe);
   }
 }

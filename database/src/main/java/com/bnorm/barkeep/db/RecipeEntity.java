@@ -1,18 +1,35 @@
 package com.bnorm.barkeep.db;
 
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.SortNatural;
+
 import com.bnorm.barkeep.model.Component;
 import com.bnorm.barkeep.model.Recipe;
 
-import javax.persistence.*;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 @Entity
 @Table(name = "tblRecipes")
+@NamedQueries({@NamedQuery(name = "RecipeEntity.findAll", query = "SELECT r FROM RecipeEntity r")})
 public class RecipeEntity implements Recipe {
 
   @Id
@@ -20,14 +37,15 @@ public class RecipeEntity implements Recipe {
   @Column(name = "id", unique = true, nullable = false)
   private long id;
 
-  @OneToMany(mappedBy = "key.recipe")
-  private List<BookRecipeEntity> books;
-
   @Column(name = "title", nullable = false)
   private String title;
 
   @Column(name = "description")
   private String description;
+
+  @ManyToOne
+  @JoinColumn(name = "owner", referencedColumnName = "id", nullable = false)
+  private UserEntity owner;
 
   @Column(name = "imageUrl")
   private String imageUrl;
@@ -48,13 +66,21 @@ public class RecipeEntity implements Recipe {
 
   @ElementCollection
   @CollectionTable(name = "tblRecipeComponents", joinColumns = @JoinColumn(name = "recipe"))
-  private List<ComponentEntity> components = new ArrayList<>();
+  @SortNatural
+  private Set<ComponentEntity> components = new TreeSet<>();
+
+  @ManyToMany
+  @JoinTable(name = "lkpBooksRecipes",
+             joinColumns = @JoinColumn(name = "recipe"),
+             inverseJoinColumns = @JoinColumn(name = "book"))
+  @SortNatural
+  private Set<BookEntity> books;
 
   public RecipeEntity() {
   }
 
   @Override
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
@@ -74,6 +100,15 @@ public class RecipeEntity implements Recipe {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  @Override
+  public UserEntity getOwner() {
+    return owner;
+  }
+
+  public void setOwner(UserEntity owner) {
+    this.owner = owner;
   }
 
   @Override
@@ -103,22 +138,20 @@ public class RecipeEntity implements Recipe {
     this.source = source;
   }
 
-  @Override
   public Instant getCreateTime() {
     return createTime.toInstant();
   }
 
-  @Override
   public Instant getModifyTime() {
     return modifyTime.toInstant();
   }
 
   @Override
-  public List<Component> getComponents() {
-    return Collections.unmodifiableList(components);
+  public Set<Component> getComponents() {
+    return Collections.unmodifiableSet(components);
   }
 
-  public void setComponents(List<ComponentEntity> components) {
-    this.components = components;
+  public void addComponent(ComponentEntity componentEntity) {
+    components.add(componentEntity);
   }
 }

@@ -1,9 +1,16 @@
 package com.bnorm.barkeep.model;
 
+import java.util.Comparator;
+
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonView;
 
-interface HasId {
+public interface HasId {
+
+  Comparator<HasId> COMPARATOR = Comparator.comparing(HasId::getId);
 
   @JsonView(HasId.class)
-  long getId();
+  @Nullable
+  Long getId();
 }

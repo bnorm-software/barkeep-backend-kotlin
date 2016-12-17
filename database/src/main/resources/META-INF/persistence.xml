@@ -8,8 +8,6 @@
 
     <class>com.bnorm.barkeep.db.BarEntity</class>
     <class>com.bnorm.barkeep.db.BookEntity</class>
-    <class>com.bnorm.barkeep.db.BookRecipeEntity</class>
-    <class>com.bnorm.barkeep.db.BookRecipeEntityKey</class>
     <class>com.bnorm.barkeep.db.IngredientEntity</class>
     <class>com.bnorm.barkeep.db.RecipeEntity</class>
     <class>com.bnorm.barkeep.db.ComponentEntity</class>

@@ -10,11 +10,11 @@ services:
     volumes:
     - ./database/init:/docker-entrypoint-initdb.d
 
-  service:
-    image: barkeep/barkeep-service
-    ports:
-    - "8080:8080"
-    environment:
-    - barkeep.db.host=database
-    links:
-    - database
+#  service:
+#    image: barkeep/barkeep-service
+#    ports:
+#    - "8080:8080"
+#    environment:
+#    - barkeep.db.host=database
+#    links:
+#    - database

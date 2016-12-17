@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.bnorm.barkeep.db.BarkeepUserDetailsService;
+import com.bnorm.barkeep.controller.security.BarkeepUserDetailsService;
 
 @Configuration
 @EnableWebSecurity

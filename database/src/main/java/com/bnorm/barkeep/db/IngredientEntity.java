@@ -1,15 +1,25 @@
 package com.bnorm.barkeep.db;
 
-import com.bnorm.barkeep.model.Ingredient;
-
-import javax.persistence.*;
-
 import java.time.Instant;
 import java.util.Date;
-import java.util.Optional;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.bnorm.barkeep.model.Ingredient;
 
 @Entity
 @Table(name = "tblIngredients")
+@NamedQueries({@NamedQuery(name = "IngredientEntity.findAll", query = "SELECT i FROM IngredientEntity i")})
 public class IngredientEntity implements Ingredient {
 
   @Id
@@ -36,7 +46,7 @@ public class IngredientEntity implements Ingredient {
   }
 
   @Override
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
@@ -54,16 +64,14 @@ public class IngredientEntity implements Ingredient {
     return parent;
   }
 
-  public void setParent(Optional<IngredientEntity> parent) {
-    this.parent = parent.orElse(null);
+  public void setParent(IngredientEntity parent) {
+    this.parent = parent;
   }
 
-  @Override
   public Instant getCreateTime() {
     return createTime.toInstant();
   }
 
-  @Override
   public Instant getModifyTime() {
     return modifyTime.toInstant();
   }

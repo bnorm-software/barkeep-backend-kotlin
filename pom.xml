@@ -8,7 +8,7 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>1.4.2.RELEASE</version>
-    <relativePath/> <!-- lookup parent from repository -->
+    <relativePath/> <!-- lookup parent from bookService -->
   </parent>
 
   <groupId>com.bnorm.barkeep</groupId>
@@ -19,7 +19,10 @@
   <modules>
     <module>barkeep-service</module>
     <module>database</module>
+    <module>database-service</module>
     <module>model</module>
+    <module>service</module>
+    <module>value</module>
   </modules>
 
   <properties>

@@ -1,18 +1,34 @@
 package com.bnorm.barkeep.db;
 
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.SortNatural;
+
 import com.bnorm.barkeep.model.Bar;
 import com.bnorm.barkeep.model.Ingredient;
 
-import javax.persistence.*;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 @Entity
 @Table(name = "tblBars")
+@NamedQueries({@NamedQuery(name = "BarEntity.findAll", query = "SELECT b FROM BarEntity b")})
 public class BarEntity implements Bar {
 
   @Id
@@ -42,20 +58,27 @@ public class BarEntity implements Bar {
   @JoinTable(name = "lkpUsersBars",
              joinColumns = @JoinColumn(name = "bar"),
              inverseJoinColumns = @JoinColumn(name = "user"))
-  private List<UserEntity> users;
+  @SortNatural
+  private Set<UserEntity> users = new TreeSet<>();
 
   @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(name = "lkpBarsIngredients",
              joinColumns = @JoinColumn(name = "bar"),
              inverseJoinColumns = @JoinColumn(name = "ingredient"))
-  private List<IngredientEntity> ingredients = new ArrayList<>();
+  @SortNatural
+  private Set<IngredientEntity> ingredients = new TreeSet<>();
 
   public BarEntity() {
   }
 
   @Override
-  public long getId() {
+  public Long getId() {
     return id;
+  }
+
+  @Override
+  public UserEntity getOwner() {
+    return owner;
   }
 
   public void setOwner(UserEntity owner) {
@@ -80,23 +103,24 @@ public class BarEntity implements Bar {
     this.description = description;
   }
 
-  @Override
   public Instant getCreateTime() {
     return createTime.toInstant();
   }
 
-  @Override
   public Instant getModifyTime() {
     return modifyTime.toInstant();
   }
 
   @Override
-  public List<Ingredient> getIngredients() {
-    return Collections.unmodifiableList(ingredients);
+  public Set<Ingredient> getIngredients() {
+    return Collections.unmodifiableSet(ingredients);
   }
 
-  public void setIngredients(List<IngredientEntity> ingredients) {
+  public void setIngredients(Set<IngredientEntity> ingredients) {
     this.ingredients = ingredients;
   }
 
+  public void addIngredient(IngredientEntity ingredient) {
+    ingredients.add(ingredient);
+  }
 }

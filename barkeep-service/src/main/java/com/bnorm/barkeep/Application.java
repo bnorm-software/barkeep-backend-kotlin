@@ -12,7 +12,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
-import com.bnorm.barkeep.db.BarkeepRepository;
+import com.bnorm.barkeep.db.DbBarService;
+import com.bnorm.barkeep.db.DbBookService;
+import com.bnorm.barkeep.db.DbIngredientService;
+import com.bnorm.barkeep.db.DbRecipeService;
+import com.bnorm.barkeep.db.DbUserService;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @SpringBootApplication
@@ -31,7 +35,7 @@ public class Application {
   }
 
   @Bean
-  public BarkeepRepository barkeepRepository(@Value("${barkeep.db.host:192.168.99.100}") String db) {
+  public EntityManager entityManager(@Value("${barkeep.db.host:192.168.99.100}") String db) {
     Properties properties = new Properties();
     properties.put("hibernate.connection.url", "jdbc:mysql://" + db + "/barkeep");
     properties.put("hibernate.connection.username", "root");
@@ -39,7 +43,31 @@ public class Application {
 
     EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("com.bnorm.barkeep.jpa",
                                                                                        properties);
-    EntityManager entityManager = entityManagerFactory.createEntityManager();
-    return new BarkeepRepository(entityManager);
+    return entityManagerFactory.createEntityManager();
+  }
+
+  @Bean
+  public DbUserService DbUserService(EntityManager entityManager) {
+    return new DbUserService(entityManager);
+  }
+
+  @Bean
+  public DbBarService DbBarService(EntityManager entityManager) {
+    return new DbBarService(entityManager);
+  }
+
+  @Bean
+  public DbIngredientService DbIngredientService(EntityManager entityManager) {
+    return new DbIngredientService(entityManager);
+  }
+
+  @Bean
+  public DbBookService DbBookService(EntityManager entityManager) {
+    return new DbBookService(entityManager);
+  }
+
+  @Bean
+  public DbRecipeService DbRecipeService(EntityManager entityManager) {
+    return new DbRecipeService(entityManager);
   }
 }

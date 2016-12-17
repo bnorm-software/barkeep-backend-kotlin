@@ -19,9 +19,7 @@ CREATE TABLE lkpUsersBars
 CREATE TABLE lkpBooksRecipes
 (
   book   BIGINT(20) UNSIGNED NOT NULL,
-  recipe BIGINT(20) UNSIGNED NOT NULL,
-  number BIGINT(20) UNSIGNED NOT NULL,
-  PRIMARY KEY (book, recipe)
+  recipe BIGINT(20) UNSIGNED NOT NULL
 );
 
 
@@ -79,6 +77,7 @@ CREATE TABLE tblRecipeComponents
 CREATE TABLE tblRecipes
 (
   id           BIGINT(20) UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  owner        INT(10) UNSIGNED                NOT NULL,
   title        VARCHAR(255)                    NOT NULL,
   description  TEXT,
   imageUrl     TEXT,
@@ -94,11 +93,18 @@ CREATE TABLE tblUsers
   id          INT(10) UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
   username    VARCHAR(255) UNIQUE          NOT NULL,
   password    VARCHAR(255)                 NOT NULL,
-  displayName VARCHAR(255)                 NOT NULL,
+  displayName VARCHAR(255),
   email       VARCHAR(255) UNIQUE          NOT NULL,
   createTime  TIMESTAMP                             DEFAULT CURRENT_TIMESTAMP,
   modifyTime  TIMESTAMP                             DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+
+ALTER TABLE tblBooks
+  ADD FOREIGN KEY (owner) REFERENCES tblUsers (id)
+  ON UPDATE CASCADE;
+CREATE INDEX FK_tblBooks_tblUsers
+  ON tblBooks (owner);
 
 
 ALTER TABLE lkpUsersBooks
@@ -115,18 +121,11 @@ CREATE INDEX FK_lkpUsersBooks_tblBooks
   ON lkpUsersBooks (book);
 
 
-ALTER TABLE lkpUsersBars
-  ADD FOREIGN KEY (user) REFERENCES tblUsers (id)
-  ON DELETE CASCADE
+ALTER TABLE tblRecipes
+  ADD FOREIGN KEY (owner) REFERENCES tblUsers (id)
   ON UPDATE CASCADE;
-ALTER TABLE lkpUsersBars
-  ADD FOREIGN KEY (bar) REFERENCES tblBars (id)
-  ON DELETE CASCADE
-  ON UPDATE CASCADE;
-CREATE INDEX FK_lkpUsersBars_tblUsers
-  ON lkpUsersBars (user);
-CREATE INDEX FK_lkpUsersBars_tblBars
-  ON lkpUsersBars (bar);
+CREATE INDEX FK_tblRecipes_tblUsers
+  ON tblRecipes (owner);
 
 
 ALTER TABLE lkpBooksRecipes
@@ -140,28 +139,7 @@ ALTER TABLE lkpBooksRecipes
 CREATE INDEX FK_lkpBooksRecipes_tblBooks
   ON lkpBooksRecipes (book);
 CREATE INDEX FK_lkpBooksRecipes_tblRecipes
-  ON lkpBooksRecipes (number);
-
-
-ALTER TABLE lkpBarsIngredients
-  ADD FOREIGN KEY (bar) REFERENCES tblBars (id)
-  ON DELETE CASCADE
-  ON UPDATE CASCADE;
-ALTER TABLE lkpBarsIngredients
-  ADD FOREIGN KEY (ingredient) REFERENCES tblIngredients (id)
-  ON DELETE CASCADE
-  ON UPDATE CASCADE;
-CREATE INDEX FK_lkpBarsIngredients_tblBars
-  ON lkpBarsIngredients (bar);
-CREATE INDEX FK_lkpBarsIngredients_tblIngredients
-  ON lkpBarsIngredients (ingredient);
-
-
-ALTER TABLE tblIngredients
-  ADD FOREIGN KEY (parent) REFERENCES tblIngredients (id)
-  ON UPDATE CASCADE;
-CREATE INDEX FK_tblIngredients_tblIngredients
-  ON tblIngredients (parent);
+  ON lkpBooksRecipes (recipe);
 
 
 ALTER TABLE tblRecipeComponents
@@ -178,7 +156,43 @@ CREATE INDEX FK_tblRecipeComponents_tblRecipes
   ON tblRecipeComponents (recipe);
 
 
-CREATE UNIQUE INDEX tblUsers_email_uindex
-  ON tblUsers (email);
-CREATE UNIQUE INDEX tblUsers_id_uindex
-  ON tblUsers (id);
+ALTER TABLE tblBars
+  ADD FOREIGN KEY (owner) REFERENCES tblUsers (id)
+  ON UPDATE CASCADE;
+CREATE INDEX FK_tblBars_tblUsers
+  ON tblBars (owner);
+
+
+ALTER TABLE lkpUsersBars
+  ADD FOREIGN KEY (user) REFERENCES tblUsers (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+ALTER TABLE lkpUsersBars
+  ADD FOREIGN KEY (bar) REFERENCES tblBars (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+CREATE INDEX FK_lkpUsersBars_tblUsers
+  ON lkpUsersBars (user);
+CREATE INDEX FK_lkpUsersBars_tblBars
+  ON lkpUsersBars (bar);
+
+
+ALTER TABLE tblIngredients
+  ADD FOREIGN KEY (parent) REFERENCES tblIngredients (id)
+  ON UPDATE CASCADE;
+CREATE INDEX FK_tblIngredients_tblIngredients
+  ON tblIngredients (parent);
+
+
+ALTER TABLE lkpBarsIngredients
+  ADD FOREIGN KEY (bar) REFERENCES tblBars (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+ALTER TABLE lkpBarsIngredients
+  ADD FOREIGN KEY (ingredient) REFERENCES tblIngredients (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+CREATE INDEX FK_lkpBarsIngredients_tblBars
+  ON lkpBarsIngredients (bar);
+CREATE INDEX FK_lkpBarsIngredients_tblIngredients
+  ON lkpBarsIngredients (ingredient);

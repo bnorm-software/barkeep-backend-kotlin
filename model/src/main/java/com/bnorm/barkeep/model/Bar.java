@@ -1,15 +1,14 @@
 package com.bnorm.barkeep.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonView;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import java.time.Instant;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public interface Bar extends HasId {
+public interface Bar extends HasId, Comparable<Bar> {
 
   @JsonView({Bar.class, User.class})
   @Nullable
@@ -19,10 +18,15 @@ public interface Bar extends HasId {
   @Nullable
   String getDescription();
 
-  Instant getCreateTime();
+  @JsonView({Bar.class})
+  @Nullable
+  User getOwner();
 
-  Instant getModifyTime();
+  @JsonView({Bar.class})
+  Set<Ingredient> getIngredients();
 
-  @JsonView(Bar.class)
-  List<Ingredient> getIngredients();
+  @Override
+  default int compareTo(Bar o) {
+    return COMPARATOR.compare(this, o);
+  }
 }

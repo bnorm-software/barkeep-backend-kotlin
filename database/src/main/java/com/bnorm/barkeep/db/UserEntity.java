@@ -1,11 +1,11 @@
 package com.bnorm.barkeep.db;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,15 +15,18 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.MapKey;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.SortNatural;
+
 import com.bnorm.barkeep.model.Bar;
 import com.bnorm.barkeep.model.Book;
+import com.bnorm.barkeep.model.Recipe;
 import com.bnorm.barkeep.model.User;
 
 @Entity
@@ -45,7 +48,7 @@ public class UserEntity implements User {
   @Column(name = "password", nullable = false)
   private String password;
 
-  @Column(name = "displayName", nullable = false)
+  @Column(name = "displayName")
   private String displayName;
 
   @Column(name = "email", unique = true, nullable = false)
@@ -63,21 +66,25 @@ public class UserEntity implements User {
   @JoinTable(name = "lkpUsersBooks",
              joinColumns = @JoinColumn(name = "user"),
              inverseJoinColumns = @JoinColumn(name = "book"))
-  @MapKey(name = "id")
-  private Map<Long, BookEntity> books = new LinkedHashMap<>();
+  @SortNatural
+  private Set<BookEntity> books = new TreeSet<>();
 
   @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(name = "lkpUsersBars",
              joinColumns = @JoinColumn(name = "user"),
              inverseJoinColumns = @JoinColumn(name = "bar"))
-  @MapKey(name = "id")
-  private Map<Long, BarEntity> bars = new LinkedHashMap<>();
+  @SortNatural
+  private Set<BarEntity> bars = new TreeSet<>();
+
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+  @SortNatural
+  private Set<RecipeEntity> recipes = new TreeSet<>();
 
   public UserEntity() {
   }
 
   @Override
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
@@ -117,39 +124,34 @@ public class UserEntity implements User {
     this.email = email;
   }
 
-  @Override
   public Instant getCreateTime() {
     return createTime.toInstant();
   }
 
-  @Override
   public Instant getModifyTime() {
     return modifyTime.toInstant();
   }
 
-  public Map<Long, BookEntity> getBookMap() {
-    return books;
-  }
-
-  public void addBook(BookEntity bookEntity) {
-    books.put(bookEntity.getId(), bookEntity);
-  }
-
-  public Map<Long, BarEntity> getBarMap() {
-    return bars;
+  @Override
+  public Set<Bar> getBars() {
+    return Collections.unmodifiableSet(bars);
   }
 
   public void addBar(BarEntity barEntity) {
-    bars.put(barEntity.getId(), barEntity);
+    bars.add(barEntity);
   }
 
   @Override
-  public Collection<Book> getBooks() {
-    return Collections.unmodifiableCollection(books.values());
+  public Set<Book> getBooks() {
+    return Collections.unmodifiableSet(books);
+  }
+
+  public void addBook(BookEntity bookEntity) {
+    books.add(bookEntity);
   }
 
   @Override
-  public Collection<Bar> getBars() {
-    return Collections.unmodifiableCollection(bars.values());
+  public Set<Recipe> getRecipes() {
+    return Collections.unmodifiableSet(recipes);
   }
 }

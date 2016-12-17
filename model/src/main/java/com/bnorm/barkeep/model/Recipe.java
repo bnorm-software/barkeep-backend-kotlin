@@ -1,27 +1,25 @@
 package com.bnorm.barkeep.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonView;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import java.time.Instant;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public interface Recipe extends HasId {
-
-  @JsonView()
-  @Override
-  long getId();
+public interface Recipe extends HasId, Comparable<Recipe> {
 
   @JsonView({Recipe.class, Book.class})
+  @Nullable
   String getTitle();
 
   @JsonView({Recipe.class, Book.class})
   @Nullable
   String getDescription();
+
+  @Nullable
+  User getOwner();
 
   @JsonView({Recipe.class, Book.class})
   @Nullable
@@ -35,10 +33,11 @@ public interface Recipe extends HasId {
   @Nullable
   String getSource();
 
-  Instant getCreateTime();
-
-  Instant getModifyTime();
-
   @JsonView(Recipe.class)
-  List<Component> getComponents();
+  Set<Component> getComponents();
+
+  @Override
+  default int compareTo(Recipe o) {
+    return COMPARATOR.compare(this, o);
+  }
 }

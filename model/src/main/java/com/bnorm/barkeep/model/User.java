@@ -1,35 +1,41 @@
 package com.bnorm.barkeep.model;
 
-import java.time.Instant;
-import java.util.Collection;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public interface User extends HasId {
+public interface User extends HasId, Comparable<User> {
 
   @JsonView(User.class)
-  long getId();
-
-  @JsonView(User.class)
+  @Nullable
   String getUsername();
 
+  @Nullable
   String getPassword();
 
   @JsonView(User.class)
+  @Nullable
   String getDisplayName();
 
   @JsonView(User.class)
+  @Nullable
   String getEmail();
 
-  Instant getCreateTime();
-
-  Instant getModifyTime();
+  @JsonView(User.class)
+  Set<Bar> getBars();
 
   @JsonView(User.class)
-  Collection<Book> getBooks();
+  Set<Book> getBooks();
 
   @JsonView(User.class)
-  Collection<Bar> getBars();
+  Set<Recipe> getRecipes();
+
+  @Override
+  default int compareTo(User o) {
+    return COMPARATOR.compare(this, o);
+  }
 }

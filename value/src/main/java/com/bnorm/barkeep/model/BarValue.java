@@ -1,18 +1,25 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.model;
 
+import javax.annotation.Nullable;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 
 @AutoValue
 public abstract class BarValue implements Bar {
 
-  @Override
-  public abstract ImmutableSet<Ingredient> getIngredients();
-
   public static Builder builder() {
     return new AutoValue_BarValue.Builder();
   }
+
+  public static JsonAdapter<BarValue> jsonAdapter(Moshi moshi) { return new AutoValue_BarValue.MoshiJsonAdapter(moshi); }
+
+  @Override
+  @Nullable
+  public abstract ImmutableSet<Ingredient> getIngredients();
 
   @AutoValue.Builder
   public abstract static class Builder {

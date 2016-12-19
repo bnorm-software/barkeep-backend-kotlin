@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +16,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -54,19 +54,23 @@ public class BarEntity implements Bar {
   @Column(name = "modifyTime", updatable = false)
   private Date modifyTime;
 
-  @ManyToMany(cascade = CascadeType.ALL)
-  @JoinTable(name = "lkpUsersBars",
-             joinColumns = @JoinColumn(name = "bar"),
-             inverseJoinColumns = @JoinColumn(name = "user"))
+  @ManyToMany(mappedBy = "bars")
   @SortNatural
   private Set<UserEntity> users = new TreeSet<>();
 
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany
   @JoinTable(name = "lkpBarsIngredients",
              joinColumns = @JoinColumn(name = "bar"),
              inverseJoinColumns = @JoinColumn(name = "ingredient"))
   @SortNatural
   private Set<IngredientEntity> ingredients = new TreeSet<>();
+
+  @PreRemove
+  public void onRemove() {
+    for (UserEntity userEntity : users) {
+      userEntity.removeBar(this);
+    }
+  }
 
   public BarEntity() {
   }
@@ -109,6 +113,10 @@ public class BarEntity implements Bar {
 
   public Instant getModifyTime() {
     return modifyTime.toInstant();
+  }
+
+  public void addUser(UserEntity userEntity) {
+    users.add(userEntity);
   }
 
   @Override

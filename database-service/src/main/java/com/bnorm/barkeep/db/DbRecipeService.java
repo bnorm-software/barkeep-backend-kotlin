@@ -57,14 +57,16 @@ public class DbRecipeService implements RecipeService {
     recipeEntity.setInstructions(recipe.getInstructions());
     recipeEntity.setSource(recipe.getInstructions());
 
-    for (com.bnorm.barkeep.model.Component component : recipe.getComponents()) {
-      ComponentEntity componentEntity = new ComponentEntity();
-      componentEntity.setIngredient(entity(component.getIngredient()));
-      componentEntity.setMin(component.getMin());
-      componentEntity.setMax(component.getMax());
-      componentEntity.setOrder(component.getOrder());
-      componentEntity.setComponentNum(component.getComponentNum());
-      recipeEntity.addComponent(componentEntity);
+    if (recipe.getComponents() != null) {
+      for (com.bnorm.barkeep.model.Component component : recipe.getComponents()) {
+        ComponentEntity componentEntity = new ComponentEntity();
+        componentEntity.setIngredient(entity(component.getIngredient()));
+        componentEntity.setMin(component.getMin());
+        componentEntity.setMax(component.getMax());
+        componentEntity.setOrder(component.getOrder());
+        componentEntity.setComponentNum(component.getComponentNum());
+        recipeEntity.addComponent(componentEntity);
+      }
     }
 
     em.getTransaction().begin();

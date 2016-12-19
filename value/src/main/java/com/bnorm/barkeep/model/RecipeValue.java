@@ -1,9 +1,13 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.model;
 
+import javax.annotation.Nullable;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 
 @AutoValue
 public abstract class RecipeValue implements Recipe {
@@ -12,7 +16,10 @@ public abstract class RecipeValue implements Recipe {
     return new AutoValue_RecipeValue.Builder();
   }
 
+  public static JsonAdapter<RecipeValue> jsonAdapter(Moshi moshi) { return new AutoValue_RecipeValue.MoshiJsonAdapter(moshi); }
+
   @Override
+  @Nullable
   public abstract ImmutableSet<Component> getComponents();
 
   @AutoValue.Builder

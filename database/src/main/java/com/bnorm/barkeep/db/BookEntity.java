@@ -17,6 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -29,11 +30,6 @@ import com.bnorm.barkeep.model.Recipe;
 @Entity
 @Table(name = "tblBooks")
 @NamedQueries({@NamedQuery(name = "BookEntity.findAll", query = "SELECT b FROM BookEntity b")})
-//@NamedQueries({@NamedQuery(name = "BookEntity.findByUser", //
-//                           query = "SELECT b FROM BookEntity b " //
-//                                   + "INNER JOIN lkpUsersBooks fk ON fk.book = b.id " //
-//                                   + "INNER JOIN UserEntity u ON u.id = fk.user " //
-//                                   + "where u.id = :id")})
 public class BookEntity implements Book {
 
   @Id
@@ -62,19 +58,23 @@ public class BookEntity implements Book {
   @Column(name = "modifyTime", updatable = false)
   private Date modifyTime;
 
-  @ManyToMany(cascade = CascadeType.ALL)
-  @JoinTable(name = "lkpUsersBooks",
-             joinColumns = @JoinColumn(name = "book"),
-             inverseJoinColumns = @JoinColumn(name = "user"))
+  @ManyToMany(mappedBy = "books")
   @SortNatural
   private Set<UserEntity> users = new TreeSet<>();
 
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany
   @JoinTable(name = "lkpBooksRecipes",
              joinColumns = @JoinColumn(name = "book"),
              inverseJoinColumns = @JoinColumn(name = "recipe"))
   @SortNatural
   private Set<RecipeEntity> recipes = new TreeSet<>();
+
+  @PreRemove
+  public void onRemove() {
+    for (UserEntity userEntity : users) {
+      userEntity.removeBook(this);
+    }
+  }
 
   public BookEntity() {
   }

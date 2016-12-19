@@ -2,7 +2,6 @@
 package com.bnorm.barkeep.controller;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -18,6 +17,7 @@ import com.bnorm.barkeep.db.DbBarService;
 import com.bnorm.barkeep.db.DbUserService;
 import com.bnorm.barkeep.model.Bar;
 import com.bnorm.barkeep.model.Ingredient;
+import com.bnorm.barkeep.model.Recipe;
 import com.bnorm.barkeep.model.User;
 import com.bnorm.barkeep.service.BarService;
 import com.bnorm.barkeep.service.UserService;
@@ -46,7 +46,7 @@ public class RestBarService extends RestService implements BarService {
 
   private Bar findByUser(User user, long barId) {
     Bar bar = barService.getBar(barId);
-    if (!user.getBars().contains(bar)) {
+    if (bar == null || (user.getBars() != null && !user.getBars().contains(bar))) {
       throw new NotFound("Unable to find bar with id=%d", barId);
     }
     return bar;
@@ -68,17 +68,25 @@ public class RestBarService extends RestService implements BarService {
     return findByUser(user, barId);
   }
 
+  @JsonView(Recipe.class)
+  @RequestMapping(value = "/{barId}/ingredients", method = RequestMethod.GET)
+  public Set<Ingredient> getBookRecipes(@PathVariable("barId") long barId) {
+    Bar bar = getBar(barId);
+    return bar.getIngredients();
+  }
+
   @JsonView(Bar.class)
   @RequestMapping(method = RequestMethod.POST)
   @Override
-  public Bar createBar(Bar bar) {
-    User currentUser = currentUser();
-    if (!isOwnedBy(bar, currentUser.getId())) {
-      throw new BadRequest("Cannot create bar owned by another user");
+  public Bar createBar(@RequestBody Bar bar) {
+    if (bar.getId() != null) {
+      throw new BadRequest("Cannot create bar with existing id=%d", bar.getId());
     }
-
+    User currentUser = currentUser();
     if (bar.getOwner() == null) {
       return barService.createBar(new BarWithOwner(bar, currentUser));
+    } else if (!isOwnedBy(bar, currentUser.getId())) {
+      throw new BadRequest("Cannot create bar owned by another user");
     } else {
       return barService.createBar(bar);
     }

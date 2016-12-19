@@ -5,6 +5,8 @@ import javax.annotation.Nullable;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 
 @AutoValue
 public abstract class UserValue implements User {
@@ -13,18 +15,23 @@ public abstract class UserValue implements User {
     return new AutoValue_UserValue.Builder();
   }
 
+  public static JsonAdapter<UserValue> jsonAdapter(Moshi moshi) { return new AutoValue_UserValue.MoshiJsonAdapter(moshi); }
+
   @Redacted
   @Nullable
   @Override
   public abstract String getPassword();
 
   @Override
+  @Nullable
   public abstract ImmutableSet<Bar> getBars();
 
   @Override
+  @Nullable
   public abstract ImmutableSet<Book> getBooks();
 
   @Override
+  @Nullable
   public abstract ImmutableSet<Recipe> getRecipes();
 
   @AutoValue.Builder

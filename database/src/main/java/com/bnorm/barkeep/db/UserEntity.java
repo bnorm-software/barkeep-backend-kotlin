@@ -3,7 +3,6 @@ package com.bnorm.barkeep.db;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -62,21 +61,29 @@ public class UserEntity implements User {
   @Column(name = "modifyTime", updatable = false)
   private Date modifyTime;
 
-  @ManyToMany(cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "owner", orphanRemoval = true)
+  @SortNatural
+  private Set<BookEntity> ownedBooks = new TreeSet<>();
+
+  @ManyToMany
   @JoinTable(name = "lkpUsersBooks",
              joinColumns = @JoinColumn(name = "user"),
              inverseJoinColumns = @JoinColumn(name = "book"))
   @SortNatural
   private Set<BookEntity> books = new TreeSet<>();
 
-  @ManyToMany(cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "owner", orphanRemoval = true)
+  @SortNatural
+  private Set<BarEntity> ownedBars = new TreeSet<>();
+
+  @ManyToMany
   @JoinTable(name = "lkpUsersBars",
              joinColumns = @JoinColumn(name = "user"),
              inverseJoinColumns = @JoinColumn(name = "bar"))
   @SortNatural
   private Set<BarEntity> bars = new TreeSet<>();
 
-  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "owner")
   @SortNatural
   private Set<RecipeEntity> recipes = new TreeSet<>();
 
@@ -141,6 +148,11 @@ public class UserEntity implements User {
     bars.add(barEntity);
   }
 
+  public void removeBar(BarEntity barEntity) {
+    bars.remove(barEntity);
+    ownedBars.remove(barEntity);
+  }
+
   @Override
   public Set<Book> getBooks() {
     return Collections.unmodifiableSet(books);
@@ -148,6 +160,12 @@ public class UserEntity implements User {
 
   public void addBook(BookEntity bookEntity) {
     books.add(bookEntity);
+  }
+
+
+  public void removeBook(BookEntity barEntity) {
+    books.remove(barEntity);
+    ownedBooks.remove(barEntity);
   }
 
   @Override

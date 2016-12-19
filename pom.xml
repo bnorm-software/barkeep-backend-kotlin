@@ -21,6 +21,7 @@
     <module>database</module>
     <module>database-service</module>
     <module>model</module>
+    <module>model-bean</module>
     <module>service</module>
     <module>value</module>
   </modules>

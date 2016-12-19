@@ -26,12 +26,15 @@ public interface User extends HasId, Comparable<User> {
   String getEmail();
 
   @JsonView(User.class)
+  @Nullable
   Set<Bar> getBars();
 
   @JsonView(User.class)
+  @Nullable
   Set<Book> getBooks();
 
   @JsonView(User.class)
+  @Nullable
   Set<Recipe> getRecipes();
 
   @Override

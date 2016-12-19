@@ -4,6 +4,8 @@ package com.bnorm.barkeep.db;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 
@@ -18,6 +20,29 @@ public class DbBarService implements BarService {
 
   public DbBarService(EntityManager entityManager) {
     this.em = entityManager;
+  }
+
+  private void transaction(Consumer<EntityManager> consumer) {
+    em.getTransaction().begin();
+    try {
+      consumer.accept(em);
+      em.getTransaction().commit();
+    } catch (Throwable t) {
+      em.getTransaction().rollback();
+      throw t;
+    }
+  }
+
+  private <T> T transaction(Function<EntityManager, T> function) {
+    em.getTransaction().begin();
+    try {
+      T result = function.apply(em);
+      em.getTransaction().commit();
+      return result;
+    } catch (Throwable t) {
+      em.getTransaction().rollback();
+      throw t;
+    }
   }
 
   private UserEntity entity(User user) {
@@ -36,74 +61,85 @@ public class DbBarService implements BarService {
 
   @Override
   public BarEntity getBar(long barId) {
-    return em.find(BarEntity.class, barId);
+    BarEntity barEntity = em.find(BarEntity.class, barId);
+    if (barEntity != null) {
+      em.refresh(barEntity);
+    }
+    return barEntity;
   }
 
   @Override
   public BarEntity createBar(Bar bar) {
-    if (bar.getId() != null) {
-      throw new IllegalArgumentException(String.format("Cannot create bar that already has an id=%d", bar.getId()));
-    }
+    return transaction(em -> {
+      if (bar.getId() != null) {
+        throw new IllegalArgumentException(String.format("Cannot create bar that already has an id=%d", bar.getId()));
+      }
 
-    BarEntity barEntity = new BarEntity();
-    UserEntity userEntity = entity(bar.getOwner());
+      BarEntity barEntity = new BarEntity();
+      UserEntity userEntity = entity(bar.getOwner());
 
-    barEntity.setTitle(bar.getTitle());
-    barEntity.setDescription(bar.getDescription());
-    barEntity.setOwner(userEntity);
-    for (Ingredient ingredient : bar.getIngredients()) {
-      barEntity.addIngredient(entity(ingredient));
-    }
+      barEntity.setTitle(bar.getTitle());
+      barEntity.setDescription(bar.getDescription());
+      barEntity.setOwner(userEntity);
+      barEntity.addUser(userEntity);
+      if (bar.getIngredients() != null) {
+        for (Ingredient ingredient : bar.getIngredients()) {
+          barEntity.addIngredient(entity(ingredient));
+        }
+      }
 
-    userEntity.addBar(barEntity);
+      em.persist(barEntity);
 
-    em.getTransaction().begin();
-    em.persist(barEntity);
-    em.merge(userEntity);
-    em.getTransaction().commit();
-    return barEntity;
+      userEntity.addBar(barEntity);
+
+      em.merge(barEntity);
+      return barEntity;
+    });
   }
 
   @Override
   public BarEntity setBar(long barId, Bar bar) {
-    BarEntity barEntity = getBar(barId);
-    if (barEntity == null) {
-      throw new IllegalArgumentException(String.format("Cannot find bar with id=%d", barId));
-    }
-    if (bar.getId() != null && bar.getId() != barId) {
-      throw new IllegalArgumentException(String.format("Cannot update bar with a different id=%d then existing id=%d",
-                                                       bar.getId(),
-                                                       barId));
-    }
-
-    if (bar.getTitle() != null) {
-      barEntity.setTitle(bar.getTitle());
-    }
-    if (bar.getDescription() != null) {
-      barEntity.setDescription(bar.getTitle());
-    }
-    if (bar.getOwner() != null) {
-      barEntity.setOwner(entity(bar.getOwner()));
-    }
-    if (bar.getIngredients() != null) {
-      // todo is this correct?
-      for (Ingredient ingredient : bar.getIngredients()) {
-        barEntity.addIngredient(entity(ingredient));
+    return transaction(em -> {
+      BarEntity barEntity = em.find(BarEntity.class, barId);
+      if (barEntity == null) {
+        throw new IllegalArgumentException(String.format("Cannot find bar with id=%d", barId));
       }
-    }
+      if (bar.getId() != null && bar.getId() != barId) {
+        throw new IllegalArgumentException(String.format("Cannot update bar with a different id=%d then existing id=%d",
+                                                         bar.getId(),
+                                                         barId));
+      }
 
-    em.getTransaction().begin();
-    em.merge(barEntity);
-    em.getTransaction().commit();
-    return barEntity;
+      if (bar.getTitle() != null) {
+        barEntity.setTitle(bar.getTitle());
+      }
+      if (bar.getDescription() != null) {
+        barEntity.setDescription(bar.getDescription());
+      }
+      if (bar.getOwner() != null) {
+        barEntity.setOwner(entity(bar.getOwner()));
+      }
+      if (bar.getIngredients() != null) {
+        // todo is this correct?
+        for (Ingredient ingredient : bar.getIngredients()) {
+          barEntity.addIngredient(entity(ingredient));
+        }
+      }
+
+      em.merge(barEntity);
+      return barEntity;
+    });
   }
 
   @Override
   public void deleteBar(long barId) {
-    BarEntity barEntity = getBar(barId);
-    if (barEntity == null) {
-      throw new IllegalArgumentException(String.format("Cannot find bar with id=%d", barId));
-    }
-    em.remove(barEntity);
+    transaction(em -> {
+      BarEntity barEntity = getBar(barId);
+      if (barEntity == null) {
+        throw new IllegalArgumentException(String.format("Cannot find bar with id=%d", barId));
+      }
+      em.remove(barEntity);
+      em.flush();
+    });
   }
 }

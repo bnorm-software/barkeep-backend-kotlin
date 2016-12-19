@@ -11,7 +11,7 @@
   </parent>
 
   <groupId>com.bnorm.barkeep</groupId>
-  <artifactId>value</artifactId>
+  <artifactId>model-bean</artifactId>
   <version>0.1-SNAPSHOT</version>
 
   <dependencies>
@@ -19,31 +19,6 @@
       <groupId>com.bnorm.barkeep</groupId>
       <artifactId>model</artifactId>
       <version>0.1-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.auto.value</groupId>
-      <artifactId>auto-value</artifactId>
-      <version>1.4-rc1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.ryanharter.auto.value</groupId>
-      <artifactId>auto-value-moshi</artifactId>
-      <version>0.4.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.squareup.auto.value</groupId>
-      <artifactId>auto-value-redacted</artifactId>
-      <version>1.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>19.0</version>
     </dependency>
   </dependencies>
 

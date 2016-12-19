@@ -25,8 +25,8 @@ public class DbBookService implements BookService {
     return em.find(UserEntity.class, user.getId());
   }
 
-  private RecipeEntity entity(Recipe recie) {
-    return em.find(RecipeEntity.class, recie.getId());
+  private RecipeEntity entity(Recipe recipe) {
+    return em.find(RecipeEntity.class, recipe.getId());
   }
 
   @Override
@@ -52,8 +52,10 @@ public class DbBookService implements BookService {
     bookEntity.setTitle(book.getTitle());
     bookEntity.setDescription(book.getDescription());
     bookEntity.setOwner(userEntity);
-    for (Recipe recipe : book.getRecipes()) {
-      bookEntity.addRecipe(entity(recipe));
+    if (book.getRecipes() != null) {
+      for (Recipe recipe : book.getRecipes()) {
+        bookEntity.addRecipe(entity(recipe));
+      }
     }
 
     userEntity.addBook(bookEntity);

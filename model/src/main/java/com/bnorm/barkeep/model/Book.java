@@ -23,6 +23,7 @@ public interface Book extends HasId, Comparable<Book> {
   User getOwner();
 
   @JsonView(Book.class)
+  @Nullable
   Set<Recipe> getRecipes();
 
   @Override

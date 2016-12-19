@@ -2,6 +2,8 @@
 package com.bnorm.barkeep.model;
 
 import com.google.auto.value.AutoValue;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 
 @AutoValue
 public abstract class ComponentValue implements Component {
@@ -9,6 +11,8 @@ public abstract class ComponentValue implements Component {
   public static Builder builder() {
     return new AutoValue_ComponentValue.Builder();
   }
+
+  public static JsonAdapter<ComponentValue> jsonAdapter(Moshi moshi) { return new AutoValue_ComponentValue.MoshiJsonAdapter(moshi); }
 
   @AutoValue.Builder
   abstract static class Builder {

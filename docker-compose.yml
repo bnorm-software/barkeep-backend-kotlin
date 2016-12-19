@@ -8,7 +8,7 @@ services:
     environment:
     - MYSQL_ROOT_PASSWORD=root
     volumes:
-    - ./database/init:/docker-entrypoint-initdb.d
+    - ./database/src/main/resources/com/bnorm/barkeep/db/init:/docker-entrypoint-initdb.d
 
 #  service:
 #    image: barkeep/barkeep-service

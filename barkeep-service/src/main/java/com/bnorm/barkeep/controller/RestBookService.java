@@ -1,7 +1,6 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.controller;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.Set;
 
@@ -79,6 +78,9 @@ public class RestBookService extends RestService implements BookService {
   @RequestMapping(method = RequestMethod.POST)
   @Override
   public Book createBook(Book book) {
+    if (book.getId() != null) {
+      throw new BadRequest("Cannot create book with existing id=%d", book.getId());
+    }
     User currentUser = currentUser();
     if (!isOwnedBy(book, currentUser.getId())) {
       throw new BadRequest("Cannot create book owned by another user");

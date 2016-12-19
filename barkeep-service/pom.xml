@@ -25,6 +25,11 @@
       <artifactId>value</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>com.bnorm.barkeep</groupId>
+      <artifactId>model-bean</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -48,6 +53,44 @@
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-config</artifactId>
       <version>4.2.0.RELEASE</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.4.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>1.1.7</version>
+      <scope>test</scope>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.squareup.retrofit2</groupId>
+      <artifactId>retrofit</artifactId>
+      <version>2.0.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.retrofit2</groupId>
+      <artifactId>converter-moshi</artifactId>
+      <version>2.0.2</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -74,6 +117,27 @@
           <plugin>
             <groupId>com.spotify</groupId>
             <artifactId>docker-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
+            <version>2.0.0</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>generate-assertions</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <packages>
+                <param>com.bnorm.barkeep.model</param>
+              </packages>
+              <excludes>
+                <param>.*AutoValue.*</param>
+                <param>.*Value.*</param>
+              </excludes>
+            </configuration>
           </plugin>
         </plugins>
       </build>

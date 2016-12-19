@@ -34,6 +34,7 @@ public interface Recipe extends HasId, Comparable<Recipe> {
   String getSource();
 
   @JsonView(Recipe.class)
+  @Nullable
   Set<Component> getComponents();
 
   @Override

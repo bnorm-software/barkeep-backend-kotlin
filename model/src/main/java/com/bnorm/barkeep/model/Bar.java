@@ -23,10 +23,12 @@ public interface Bar extends HasId, Comparable<Bar> {
   User getOwner();
 
   @JsonView({Bar.class})
+  @Nullable
   Set<Ingredient> getIngredients();
 
   @Override
   default int compareTo(Bar o) {
     return COMPARATOR.compare(this, o);
   }
+
 }

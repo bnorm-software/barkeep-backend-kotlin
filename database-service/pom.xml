@@ -60,25 +60,12 @@
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
-        <version>2.0.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>generate-assertions</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <packages>
-            <param>com.bnorm.barkeep.model</param>
-          </packages>
-          <excludes>
-            <param>.*AutoValue.*</param>
-            <param>.*Value.*</param>
-          </excludes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

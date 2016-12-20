@@ -26,7 +26,7 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-class BarkeepServiceBaseTest extends AbstractIntegrationTest {
+public abstract class BarkeepServiceBaseTest extends AbstractIntegrationTest {
 
   // constants
   static final int CODE_SUCCESS = 200;
@@ -69,7 +69,8 @@ class BarkeepServiceBaseTest extends AbstractIntegrationTest {
                      .header("Authorization", Credentials.basic(TEST_USER.getUsername(), TEST_USER.getPassword()))
                      .build();
     };
-    OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new WireTraceInterceptor())
+    OkHttpClient client = new OkHttpClient.Builder()
+//            .addInterceptor(new WireTraceInterceptor())
                                                     .addInterceptor(new CookieInterceptor(url))
                                                     .authenticator(authenticator)
                                                     .build();
@@ -96,6 +97,5 @@ class BarkeepServiceBaseTest extends AbstractIntegrationTest {
                                               .build();
 
     service = retrofit.create(BarkeepService.class);
-    //    service.getBars().execute();
   }
 }

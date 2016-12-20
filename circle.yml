@@ -1,0 +1,11 @@
+machine:
+  java:
+    version: openjdk8
+  services:
+    - docker
+
+test:
+  post:
+    - cp -r database-service/target/site $CIRCLE_ARTIFACTS
+    - cp -r barkeep-service/target/site $CIRCLE_ARTIFACTS
+    - bash <(curl -s https://codecov.io/bash)

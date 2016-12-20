@@ -7,7 +7,7 @@ import com.bnorm.barkeep.model.Bar;
 
 public interface BarService {
 
-  Collection<Bar> listBars();
+  Collection<Bar> getBars();
 
   Bar getBar(long barId);
 

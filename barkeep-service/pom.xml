@@ -22,7 +22,7 @@
     </dependency>
     <dependency>
       <groupId>com.bnorm.barkeep</groupId>
-      <artifactId>value</artifactId>
+      <artifactId>model-value</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>
     <dependency>

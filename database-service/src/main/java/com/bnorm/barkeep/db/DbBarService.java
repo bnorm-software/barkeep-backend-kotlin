@@ -4,6 +4,7 @@ package com.bnorm.barkeep.db;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -19,7 +20,7 @@ public class DbBarService implements BarService {
   private final EntityManager em;
 
   public DbBarService(EntityManager entityManager) {
-    this.em = entityManager;
+    this.em = Objects.requireNonNull(entityManager);
   }
 
   private void transaction(Consumer<EntityManager> consumer) {
@@ -54,7 +55,7 @@ public class DbBarService implements BarService {
   }
 
   @Override
-  public Collection<Bar> listBars() {
+  public Collection<Bar> getBars() {
     List<BarEntity> barEntities = em.createNamedQuery("BarEntity.findAll", BarEntity.class).getResultList();
     return Collections.unmodifiableList(barEntities);
   }
@@ -70,13 +71,19 @@ public class DbBarService implements BarService {
 
   @Override
   public BarEntity createBar(Bar bar) {
-    return transaction(em -> {
-      if (bar.getId() != null) {
-        throw new IllegalArgumentException(String.format("Cannot create bar that already has an id=%d", bar.getId()));
-      }
+    if (bar.getId() != null) {
+      throw new IllegalArgumentException(String.format("Cannot create bar that already has an id=%d", bar.getId()));
+    } else if (bar.getOwner() == null) {
+      throw new IllegalArgumentException("Cannot create bar without an owner");
+    }
+    UserEntity userEntity = entity(bar.getOwner());
+    if (userEntity == null) {
+      throw new IllegalArgumentException(String.format("Cannot create bar with an unknown owner id=%d",
+                                                       bar.getOwner().getId()));
+    }
 
+    return transaction(em -> {
       BarEntity barEntity = new BarEntity();
-      UserEntity userEntity = entity(bar.getOwner());
 
       barEntity.setTitle(bar.getTitle());
       barEntity.setDescription(bar.getDescription());

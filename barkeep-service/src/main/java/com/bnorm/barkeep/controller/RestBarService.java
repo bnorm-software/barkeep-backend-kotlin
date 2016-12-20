@@ -55,7 +55,7 @@ public class RestBarService extends RestService implements BarService {
   @JsonView(Bar.class)
   @RequestMapping(method = RequestMethod.GET)
   @Override
-  public Collection<Bar> listBars() {
+  public Collection<Bar> getBars() {
     User user = userService.getUser(currentUser().getId());
     return user.getBars();
   }

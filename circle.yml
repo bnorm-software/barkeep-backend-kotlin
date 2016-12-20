@@ -4,6 +4,9 @@ machine:
   services:
     - docker
 
+dependencies:
+  override:
+    - mvn install -DskipTests
 test:
   post:
     - cp -r database-service/target/site $CIRCLE_ARTIFACTS

@@ -9,6 +9,8 @@ dependencies:
     - mvn install -DskipTests
 test:
   post:
-    - cp -r database-service/target/site $CIRCLE_ARTIFACTS
-    - cp -r barkeep-service/target/site $CIRCLE_ARTIFACTS
+    - mkdir -p $CIRCLE_ARTIFACTS/jacoco/
+    - find . -type d -regex ".*/target/site/jacoco" -exec cp -r {} $CIRCLE_ARTIFACTS/jacoco/ \;
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
     - bash <(curl -s https://codecov.io/bash)

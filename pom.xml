@@ -53,6 +53,9 @@
               </goals>
             </execution>
           </executions>
+          <configuration>
+            <outputDirectory>${project.reporting.outputDirectory}/jacoco/${project.artifactId}</outputDirectory>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.assertj</groupId>

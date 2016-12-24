@@ -11,13 +11,13 @@
   </parent>
 
   <groupId>com.bnorm.barkeep.service</groupId>
-  <artifactId>barkeep-service</artifactId>
+  <artifactId>service-rest</artifactId>
   <version>0.1-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
       <groupId>com.bnorm.barkeep</groupId>
-      <artifactId>database-service</artifactId>
+      <artifactId>service-database</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>
     <dependency>

@@ -17,13 +17,13 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>barkeep-service</module>
-    <module>database</module>
-    <module>database-service</module>
     <module>model</module>
     <module>model-bean</module>
+    <module>model-database</module>
     <module>model-value</module>
     <module>service</module>
+    <module>service-database</module>
+    <module>service-rest</module>
   </modules>
 
   <properties>

@@ -172,4 +172,8 @@ public class UserEntity implements User {
   public Set<Recipe> getRecipes() {
     return Collections.unmodifiableSet(recipes);
   }
+
+  public void addRecipe(RecipeEntity recipeEntity) {
+    recipes.add(recipeEntity);
+  }
 }

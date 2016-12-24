@@ -7,7 +7,7 @@ import com.bnorm.barkeep.model.Ingredient;
 
 public interface IngredientService {
 
-  Collection<Ingredient> listIngredients();
+  Collection<Ingredient> getIngredients();
 
   Ingredient getIngredient(long ingredientId);
 

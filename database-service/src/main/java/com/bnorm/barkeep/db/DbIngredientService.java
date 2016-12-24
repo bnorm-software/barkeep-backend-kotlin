@@ -1,8 +1,6 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.db;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,32 +10,31 @@ import com.bnorm.barkeep.model.Ingredient;
 import com.bnorm.barkeep.service.IngredientService;
 
 
-public class DbIngredientService implements IngredientService {
-
-  private final EntityManager em;
+public class DbIngredientService extends AbstractDbService implements IngredientService {
 
   public DbIngredientService(EntityManager entityManager) {
-    this.em = entityManager;
+    super(entityManager);
   }
 
   private IngredientEntity parentEntity(Ingredient ingredient) {
-    return Optional.ofNullable(ingredient)
-                   .map(Ingredient::getParent)
-                   .map(Ingredient::getId)
-                   .map(this::getIngredient)
-                   .orElse(null);
+    Optional<Long> id = Optional.ofNullable(ingredient).map(Ingredient::getParent).map(Ingredient::getId);
+    if (id.isPresent()) {
+      IngredientEntity parent = findIngredient(id.get());
+      // todo check parent is not null
+      return parent;
+    } else {
+      return null;
+    }
   }
 
   @Override
-  public Collection<Ingredient> listIngredients() {
-    List<IngredientEntity> ingredientEntities = em.createNamedQuery("IngredientEntity.findAll", IngredientEntity.class)
-                                                  .getResultList();
-    return Collections.unmodifiableList(ingredientEntities);
+  public List<Ingredient> getIngredients() {
+    return super.getIngredients();
   }
 
   @Override
   public IngredientEntity getIngredient(long ingredientId) {
-    return em.find(IngredientEntity.class, ingredientId);
+    return super.getIngredient(ingredientId);
   }
 
   @Override
@@ -46,51 +43,44 @@ public class DbIngredientService implements IngredientService {
       throw new IllegalArgumentException(String.format("Cannot create ingredient that already has an id=%d",
                                                        ingredient.getId()));
     }
-
-    IngredientEntity ingredientEntity = new IngredientEntity();
     IngredientEntity parentEntity = parentEntity(ingredient);
+    // todo check parentEntity exists if needed
 
-    ingredientEntity.setTitle(ingredient.getTitle());
-    ingredientEntity.setParent(parentEntity);
+    return transaction(em -> {
+      IngredientEntity ingredientEntity = new IngredientEntity();
 
-    em.getTransaction().begin();
-    em.persist(ingredientEntity);
-    em.getTransaction().commit();
-    return ingredientEntity;
+      ingredientEntity.setTitle(ingredient.getTitle());
+      ingredientEntity.setParent(parentEntity);
+
+      em.persist(ingredientEntity);
+      return ingredientEntity;
+    });
   }
 
   @Override
   public IngredientEntity setIngredient(long ingredientId, Ingredient ingredient) {
-    IngredientEntity ingredientEntity = getIngredient(ingredientId);
-    if (ingredientEntity == null) {
-      throw new IllegalArgumentException(String.format("Cannot find ingredient with id=%d", ingredientId));
-    }
-    if (ingredient.getId() != null && ingredient.getId() != ingredientId) {
-      throw new IllegalArgumentException(String.format(
-              "Cannot update ingredient with a different id=%d then existing id=%d",
-              ingredient.getId(),
-              ingredientId));
-    }
+    IngredientEntity ingredientEntity = findIngredient(ingredientId);
+    requireExists(ingredientEntity, ingredientId, "ingredient");
+    requireMatch(ingredient, ingredientId, "ingredient");
 
-    if (ingredient.getTitle() != null) {
-      ingredientEntity.setTitle(ingredient.getTitle());
-    }
-    if (ingredient.getParent() != null) {
-      ingredientEntity.setParent(parentEntity(ingredient));
-    }
+    return transaction(em -> {
+      if (ingredient.getTitle() != null) {
+        ingredientEntity.setTitle(ingredient.getTitle());
+      }
+      if (ingredient.getParent() != null) {
+        ingredientEntity.setParent(parentEntity(ingredient));
+      }
 
-    em.getTransaction().begin();
-    em.merge(ingredientEntity);
-    em.getTransaction().commit();
-    return ingredientEntity;
+      return ingredientEntity;
+    });
   }
 
   @Override
   public void deleteIngredient(long ingredientId) {
-    IngredientEntity ingredientEntity = getIngredient(ingredientId);
-    if (ingredientEntity == null) {
-      throw new IllegalArgumentException(String.format("Cannot find ingredient with id=%d", ingredientId));
-    }
-    em.remove(ingredientEntity);
+    transaction(em -> {
+      IngredientEntity ingredientEntity = findIngredient(ingredientId);
+      requireExists(ingredientEntity, ingredientId, "ingredient");
+      em.remove(ingredientEntity);
+    });
   }
 }

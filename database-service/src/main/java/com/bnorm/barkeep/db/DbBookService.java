@@ -1,112 +1,95 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.db;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 
 import com.bnorm.barkeep.model.Book;
 import com.bnorm.barkeep.model.Recipe;
-import com.bnorm.barkeep.model.User;
 import com.bnorm.barkeep.service.BookService;
 
-
-public class DbBookService implements BookService {
-
-  private final EntityManager em;
+public class DbBookService extends AbstractDbService implements BookService {
 
   public DbBookService(EntityManager entityManager) {
-    this.em = entityManager;
-  }
-
-  private UserEntity entity(User user) {
-    return em.find(UserEntity.class, user.getId());
-  }
-
-  private RecipeEntity entity(Recipe recipe) {
-    return em.find(RecipeEntity.class, recipe.getId());
+    super(entityManager);
   }
 
   @Override
-  public Collection<Book> listBooks() {
-    List<BookEntity> bookEntities = em.createNamedQuery("BookEntity.findAll", BookEntity.class).getResultList();
-    return Collections.unmodifiableList(bookEntities);
+  public List<Book> getBooks() {
+    return super.getBooks();
   }
 
   @Override
   public BookEntity getBook(long bookId) {
-    return em.find(BookEntity.class, bookId);
+    return super.getBook(bookId);
   }
 
   @Override
   public BookEntity createBook(Book book) {
     if (book.getId() != null) {
       throw new IllegalArgumentException(String.format("Cannot create book that already has an id=%d", book.getId()));
+    } else if (book.getOwner() == null) {
+      throw new IllegalArgumentException("Cannot create book without an owner");
+    }
+    UserEntity userEntity = find(book.getOwner());
+    if (userEntity == null) {
+      throw new IllegalArgumentException(String.format("Cannot create book with an unknown owner id=%d",
+                                                       book.getOwner().getId()));
     }
 
-    BookEntity bookEntity = new BookEntity();
-    UserEntity userEntity = entity(book.getOwner());
+    return transaction(em -> {
+      BookEntity bookEntity = new BookEntity();
 
-    bookEntity.setTitle(book.getTitle());
-    bookEntity.setDescription(book.getDescription());
-    bookEntity.setOwner(userEntity);
-    if (book.getRecipes() != null) {
-      for (Recipe recipe : book.getRecipes()) {
-        bookEntity.addRecipe(entity(recipe));
+      bookEntity.setTitle(book.getTitle());
+      bookEntity.setDescription(book.getDescription());
+      bookEntity.setOwner(userEntity);
+      if (book.getRecipes() != null) {
+        for (Recipe recipe : book.getRecipes()) {
+          bookEntity.addRecipe(find(recipe));
+        }
       }
-    }
 
-    userEntity.addBook(bookEntity);
+      em.persist(bookEntity);
 
-    em.getTransaction().begin();
-    em.persist(bookEntity);
-    em.merge(userEntity);
-    em.getTransaction().commit();
-    return bookEntity;
+      userEntity.addBook(bookEntity);
+      return bookEntity;
+    });
   }
 
   @Override
   public BookEntity setBook(long bookId, Book book) {
-    BookEntity bookEntity = getBook(bookId);
-    if (bookEntity == null) {
-      throw new IllegalArgumentException(String.format("Cannot find book with id=%d", bookId));
-    }
-    if (book.getId() != null && book.getId() != bookId) {
-      throw new IllegalArgumentException(String.format("Cannot update book with a different id=%d then existing id=%d",
-                                                       book.getId(),
-                                                       bookId));
-    }
+    BookEntity bookEntity = findBook(bookId);
+    requireExists(bookEntity, bookId, "book");
+    requireMatch(book, bookId, "book");
 
-    if (book.getTitle() != null) {
-      bookEntity.setTitle(book.getTitle());
-    }
-    if (book.getDescription() != null) {
-      bookEntity.setDescription(book.getTitle());
-    }
-    if (book.getOwner() != null) {
-      bookEntity.setOwner(entity(book.getOwner()));
-    }
-    if (book.getRecipes() != null) {
-      // todo is this correct?
-      for (Recipe recipe : book.getRecipes()) {
-        bookEntity.addRecipe(entity(recipe));
+    return transaction(em -> {
+      if (book.getTitle() != null) {
+        bookEntity.setTitle(book.getTitle());
       }
-    }
+      if (book.getDescription() != null) {
+        bookEntity.setDescription(book.getTitle());
+      }
+      if (book.getOwner() != null) {
+        bookEntity.setOwner(find(book.getOwner()));
+      }
+      if (book.getRecipes() != null) {
+        // todo is this correct?
+        for (Recipe recipe : book.getRecipes()) {
+          bookEntity.addRecipe(find(recipe));
+        }
+      }
 
-    em.getTransaction().begin();
-    em.merge(bookEntity);
-    em.getTransaction().commit();
-    return bookEntity;
+      return bookEntity;
+    });
   }
 
   @Override
   public void deleteBook(long bookId) {
-    BookEntity bookEntity = getBook(bookId);
-    if (bookEntity == null) {
-      throw new IllegalArgumentException(String.format("Cannot find book with id=%d", bookId));
-    }
-    em.remove(bookEntity);
+    transaction(em -> {
+      BookEntity bookEntity = findBook(bookId);
+      requireExists(bookEntity, bookId, "book");
+      em.remove(bookEntity);
+    });
   }
 }

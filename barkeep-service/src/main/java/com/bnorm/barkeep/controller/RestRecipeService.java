@@ -1,9 +1,7 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.controller;
 
-import java.time.Instant;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -56,7 +54,7 @@ public class RestRecipeService extends RestService implements RecipeService {
   @JsonView(Recipe.class)
   @RequestMapping(method = RequestMethod.GET)
   @Override
-  public Collection<Recipe> listRecipes() {
+  public Collection<Recipe> getRecipes() {
     User user = userService.getUser(currentUser().getId());
     return user.getRecipes();
   }

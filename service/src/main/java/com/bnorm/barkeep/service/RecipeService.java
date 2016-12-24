@@ -7,7 +7,7 @@ import com.bnorm.barkeep.model.Recipe;
 
 public interface RecipeService {
 
-  Collection<Recipe> listRecipes();
+  Collection<Recipe> getRecipes();
 
   Recipe getRecipe(long recipeId);
 

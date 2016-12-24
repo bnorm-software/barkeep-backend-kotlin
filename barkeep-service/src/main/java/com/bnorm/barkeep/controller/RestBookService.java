@@ -54,7 +54,7 @@ public class RestBookService extends RestService implements BookService {
   @JsonView(Book.class)
   @RequestMapping(method = RequestMethod.GET)
   @Override
-  public Collection<Book> listBooks() {
+  public Collection<Book> getBooks() {
     User user = userService.getUser(currentUser().getId());
     return user.getBooks();
   }

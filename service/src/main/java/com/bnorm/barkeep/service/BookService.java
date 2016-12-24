@@ -7,7 +7,7 @@ import com.bnorm.barkeep.model.Book;
 
 public interface BookService {
 
-  Collection<Book> listBooks();
+  Collection<Book> getBooks();
 
   Book getBook(long bookId);
 

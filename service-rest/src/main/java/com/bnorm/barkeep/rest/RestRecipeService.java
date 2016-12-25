@@ -1,5 +1,5 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
-package com.bnorm.barkeep.controller;
+package com.bnorm.barkeep.rest;
 
 import java.util.Collection;
 import java.util.Set;
@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 @RequestMapping("/recipes")
-public class RestRecipeService extends RestService implements RecipeService {
+public class RestRecipeService extends AbstractRestService implements RecipeService {
 
   private final UserService userService;
   private final RecipeService recipeService;

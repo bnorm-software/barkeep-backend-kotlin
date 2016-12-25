@@ -1,5 +1,5 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
-package com.bnorm.barkeep.controller.security;
+package com.bnorm.barkeep.security;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -8,7 +8,6 @@ import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.bnorm.barkeep.db.UserEntity;
 import com.bnorm.barkeep.model.Bar;
 import com.bnorm.barkeep.model.Book;
 import com.bnorm.barkeep.model.Recipe;
@@ -16,9 +15,9 @@ import com.bnorm.barkeep.model.User;
 
 class UserEntityDetails implements UserDetails, User {
 
-  private final UserEntity user;
+  private final User user;
 
-  UserEntityDetails(UserEntity user) {
+  UserEntityDetails(User user) {
     this.user = user;
   }
 

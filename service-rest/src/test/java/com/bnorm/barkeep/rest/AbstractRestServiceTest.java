@@ -1,5 +1,5 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
-package com.bnorm.barkeep;
+package com.bnorm.barkeep.rest;
 
 import java.util.Properties;
 
@@ -23,6 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 
+import com.bnorm.barkeep.Application;
 import com.bnorm.barkeep.db.DbUserService;
 import com.bnorm.barkeep.model.Bar;
 import com.bnorm.barkeep.model.BarValue;

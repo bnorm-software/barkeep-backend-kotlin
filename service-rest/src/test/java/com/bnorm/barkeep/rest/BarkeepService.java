@@ -1,5 +1,5 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
-package com.bnorm.barkeep;
+package com.bnorm.barkeep.rest;
 
 import java.util.List;
 

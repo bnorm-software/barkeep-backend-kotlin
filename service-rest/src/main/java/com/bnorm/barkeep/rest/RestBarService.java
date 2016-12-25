@@ -1,5 +1,5 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
-package com.bnorm.barkeep.controller;
+package com.bnorm.barkeep.rest;
 
 import java.util.Collection;
 import java.util.Set;
@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 @RequestMapping("/bars")
-public class RestBarService extends RestService implements BarService {
+public class RestBarService extends AbstractRestService implements BarService {
 
   private final UserService userService;
   private final BarService barService;

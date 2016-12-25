@@ -1,5 +1,5 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
-package com.bnorm.barkeep.controller.security;
+package com.bnorm.barkeep.security;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;

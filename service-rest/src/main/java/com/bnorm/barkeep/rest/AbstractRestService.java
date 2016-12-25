@@ -1,5 +1,5 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
-package com.bnorm.barkeep.controller;
+package com.bnorm.barkeep.rest;
 
 import javax.annotation.Nullable;
 
@@ -12,7 +12,7 @@ import com.bnorm.barkeep.model.Book;
 import com.bnorm.barkeep.model.Recipe;
 import com.bnorm.barkeep.model.User;
 
-class RestService {
+class AbstractRestService {
 
   static User currentUser() {
     return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

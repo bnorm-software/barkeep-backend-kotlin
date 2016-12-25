@@ -16,8 +16,7 @@ import retrofit2.Response;
 import static com.bnorm.barkeep.model.BarAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-public class BarkeepService_BarTest extends BarkeepServiceBaseTest {
+public class RestBarServiceTest extends AbstractRestServiceTest {
 
   @After
   public void cleanup() throws IOException {

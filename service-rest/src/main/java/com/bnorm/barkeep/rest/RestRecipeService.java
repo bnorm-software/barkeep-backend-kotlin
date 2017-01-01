@@ -45,7 +45,8 @@ public class RestRecipeService extends AbstractRestService implements RecipeServ
 
   private Recipe findByUser(User user, long recipeId) {
     Recipe recipe = recipeService.getRecipe(recipeId);
-    if (!user.getRecipes().contains(recipe)) {
+    Set<Recipe> recipes = user.getRecipes();
+    if (recipe == null || (recipes != null && !recipes.contains(recipe))) {
       throw new NotFound("Unable to find recipe with id=%d", recipeId);
     }
     return recipe;
@@ -70,14 +71,15 @@ public class RestRecipeService extends AbstractRestService implements RecipeServ
   @JsonView(Recipe.class)
   @RequestMapping(method = RequestMethod.POST)
   @Override
-  public Recipe createRecipe(Recipe recipe) {
-    User currentUser = currentUser();
-    if (!isOwnedBy(recipe, currentUser.getId())) {
-      throw new BadRequest("Cannot create recipe owned by another user");
+  public Recipe createRecipe(@RequestBody Recipe recipe) {
+    if (recipe.getId() != null) {
+      throw new BadRequest("Cannot create recipe with existing id=%d", recipe.getId());
     }
-
+    User currentUser = currentUser();
     if (recipe.getOwner() == null) {
       return recipeService.createRecipe(new RecipeWithOwner(recipe, currentUser));
+    } else if (!isOwnedBy(recipe, currentUser.getId())) {
+      throw new BadRequest("Cannot create recipe owned by another user");
     } else {
       return recipeService.createRecipe(recipe);
     }

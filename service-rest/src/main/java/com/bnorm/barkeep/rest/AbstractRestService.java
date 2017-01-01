@@ -26,12 +26,12 @@ class AbstractRestService {
     return bar != null && match(bar.getOwner(), userId);
   }
 
-  static boolean isOwnedBy(Book book, long userId) {
-    return match(book.getOwner(), userId);
+  static boolean isOwnedBy(@Nullable Book book, long userId) {
+    return book != null && match(book.getOwner(), userId);
   }
 
-  static boolean isOwnedBy(Recipe book, long userId) {
-    return match(book.getOwner(), userId);
+  static boolean isOwnedBy(@Nullable Recipe recipe, long userId) {
+    return recipe != null && match(recipe.getOwner(), userId);
   }
 
   @ResponseStatus(value = HttpStatus.BAD_REQUEST)

@@ -45,7 +45,8 @@ public class RestBookService extends AbstractRestService implements BookService 
 
   private Book findByUser(User user, long bookId) {
     Book book = bookService.getBook(bookId);
-    if (!user.getBooks().contains(book)) {
+    Set<Book> books = user.getBooks();
+    if (book == null || (books != null && !books.contains(book))) {
       throw new NotFound("Unable to find book with id=%d", bookId);
     }
     return book;
@@ -77,17 +78,15 @@ public class RestBookService extends AbstractRestService implements BookService 
   @JsonView(Book.class)
   @RequestMapping(method = RequestMethod.POST)
   @Override
-  public Book createBook(Book book) {
+  public Book createBook(@RequestBody Book book) {
     if (book.getId() != null) {
       throw new BadRequest("Cannot create book with existing id=%d", book.getId());
     }
     User currentUser = currentUser();
-    if (!isOwnedBy(book, currentUser.getId())) {
-      throw new BadRequest("Cannot create book owned by another user");
-    }
-
     if (book.getOwner() == null) {
       return bookService.createBook(new BookWithOwner(book, currentUser));
+    } else if (!isOwnedBy(book, currentUser.getId())) {
+      throw new BadRequest("Cannot create book owned by another user");
     } else {
       return bookService.createBook(book);
     }

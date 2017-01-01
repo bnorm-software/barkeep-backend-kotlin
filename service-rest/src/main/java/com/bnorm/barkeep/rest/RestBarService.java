@@ -46,7 +46,8 @@ public class RestBarService extends AbstractRestService implements BarService {
 
   private Bar findByUser(User user, long barId) {
     Bar bar = barService.getBar(barId);
-    if (bar == null || (user.getBars() != null && !user.getBars().contains(bar))) {
+    Set<Bar> bars = user.getBars();
+    if (bar == null || (bars != null && !bars.contains(bar))) {
       throw new NotFound("Unable to find bar with id=%d", barId);
     }
     return bar;

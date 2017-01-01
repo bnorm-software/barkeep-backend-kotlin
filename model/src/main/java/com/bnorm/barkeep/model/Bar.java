@@ -30,5 +30,4 @@ public interface Bar extends HasId, Comparable<Bar> {
   default int compareTo(Bar o) {
     return COMPARATOR.compare(this, o);
   }
-
 }

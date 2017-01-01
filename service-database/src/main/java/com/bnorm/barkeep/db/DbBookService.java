@@ -68,7 +68,7 @@ public class DbBookService extends AbstractDbService implements BookService {
         bookEntity.setTitle(book.getTitle());
       }
       if (book.getDescription() != null) {
-        bookEntity.setDescription(book.getTitle());
+        bookEntity.setDescription(book.getDescription());
       }
       if (book.getOwner() != null) {
         bookEntity.setOwner(find(book.getOwner()));

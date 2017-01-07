@@ -25,7 +25,7 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 
-import com.bnorm.barkeep.Application;
+import com.bnorm.barkeep.RestApplication;
 import com.bnorm.barkeep.db.DbUserService;
 import com.bnorm.barkeep.model.Bar;
 import com.bnorm.barkeep.model.BarValue;
@@ -50,7 +50,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = Application.class, initializers = AbstractRestServiceTest.Initializer.class)
+@ContextConfiguration(classes = RestApplication.class, initializers = AbstractRestServiceTest.Initializer.class)
 @DirtiesContext // forces a reload of app for every test - required because database is reloaded
 public abstract class AbstractRestServiceTest {
 

@@ -10,7 +10,7 @@
     <version>0.1-SNAPSHOT</version>
   </parent>
 
-  <groupId>com.bnorm.barkeep.service</groupId>
+  <groupId>com.bnorm.barkeep</groupId>
   <artifactId>service-rest</artifactId>
   <version>0.1-SNAPSHOT</version>
 

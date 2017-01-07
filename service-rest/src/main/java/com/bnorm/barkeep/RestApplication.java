@@ -36,10 +36,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 @SpringBootApplication
-public class Application {
+public class RestApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(Application.class, args);
+    SpringApplication.run(RestApplication.class, args);
   }
 
   @Bean

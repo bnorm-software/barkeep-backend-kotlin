@@ -11,15 +11,17 @@ import org.assertj.core.api.Condition;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.runner.RunWith;
+import org.junit.Rule;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.EnvironmentTestUtils;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 
@@ -47,22 +49,19 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = Application.class, initializers = AbstractRestServiceTest.Initializer.class)
+@DirtiesContext // forces a reload of app for every test - required because database is reloaded
 public abstract class AbstractRestServiceTest {
 
-  private static final int MYSQL_PORT = 3306;
-
   @ClassRule
-  public static final GenericContainer mysql;
+  public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
 
-  static {
-    mysql = new GenericContainer("mysql:latest");
-    mysql.withClasspathResourceMapping("com/bnorm/barkeep/db/init", "/docker-entrypoint-initdb.d", BindMode.READ_ONLY);
-    mysql.addEnv("MYSQL_ROOT_PASSWORD", "root");
-    mysql.addExposedPort(MYSQL_PORT);
-  }
+  @Rule
+  public final SpringMethodRule springMethodRule = new SpringMethodRule();
+
+  @LocalServerPort
+  private int port;
 
 
   public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
@@ -74,6 +73,19 @@ public abstract class AbstractRestServiceTest {
                                           "barkeep.db.host=" + mysql.getContainerIpAddress(),
                                           "barkeep.db.port=" + mysql.getMappedPort(MYSQL_PORT));
     }
+  }
+
+
+  private static final int MYSQL_PORT = 3306;
+
+  @ClassRule
+  public static final GenericContainer mysql;
+
+  static {
+    mysql = new GenericContainer("mysql:latest");
+    mysql.withClasspathResourceMapping("com/bnorm/barkeep/db/init", "/docker-entrypoint-initdb.d", BindMode.READ_ONLY);
+    mysql.addEnv("MYSQL_ROOT_PASSWORD", "root");
+    mysql.addExposedPort(MYSQL_PORT);
   }
 
 
@@ -94,9 +106,6 @@ public abstract class AbstractRestServiceTest {
                                                                    "valid id");
 
   // test service
-
-  @LocalServerPort
-  private int port;
 
   BarkeepService service;
 
@@ -130,10 +139,9 @@ public abstract class AbstractRestServiceTest {
     urlBuilder.scheme("http");
     urlBuilder.host("localhost");
     urlBuilder.port(port);
-    //    urlBuilder.addPathSegment("api");
-    //    urlBuilder.addPathSegment("rest");
-    //    urlBuilder.addPathSegment("v1");
-    urlBuilder.addPathSegment("barkeep");
+    urlBuilder.addPathSegment("rest");
+    urlBuilder.addPathSegment("api");
+    urlBuilder.addPathSegment("v1");
     // This last, empty segment adds a trailing '/' which is required for relative paths in the annotations
     urlBuilder.addPathSegment("");
     HttpUrl url = urlBuilder.build();

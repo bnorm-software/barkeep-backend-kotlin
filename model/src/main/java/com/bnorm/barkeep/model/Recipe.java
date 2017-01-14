@@ -18,6 +18,7 @@ public interface Recipe extends HasId, Comparable<Recipe> {
   @Nullable
   String getDescription();
 
+  @JsonView(Recipe.class)
   @Nullable
   User getOwner();
 

@@ -1,6 +1,6 @@
-version: '2'
-services:
+version: "2"
 
+services:
   database:
     image: mysql
     ports:
@@ -8,7 +8,7 @@ services:
     environment:
     - MYSQL_ROOT_PASSWORD=root
     volumes:
-    - ./database/src/main/resources/com/bnorm/barkeep/db/init:/docker-entrypoint-initdb.d
+    - ./model-database/src/main/resources/com/bnorm/barkeep/db/init:/docker-entrypoint-initdb.d
 
 #  service:
 #    image: barkeep/barkeep-service
@@ -16,5 +16,3 @@ services:
 #    - "8080:8080"
 #    environment:
 #    - barkeep.db.host=database
-#    links:
-#    - database

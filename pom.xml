@@ -24,6 +24,7 @@
     <module>service</module>
     <module>service-database</module>
     <module>service-rest</module>
+    <module>service-web</module>
   </modules>
 
   <properties>
@@ -31,6 +32,18 @@
     <java.version>1.8</java.version>
     <docker.image.prefix>barkeep</docker.image.prefix>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-bom</artifactId>
+        <version>7.7.5</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>

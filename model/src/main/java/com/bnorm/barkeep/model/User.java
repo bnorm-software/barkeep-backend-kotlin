@@ -17,7 +17,7 @@ public interface User extends HasId, Comparable<User> {
   @Nullable
   String getPassword();
 
-  @JsonView(User.class)
+  @JsonView(HasId.class)
   @Nullable
   String getDisplayName();
 

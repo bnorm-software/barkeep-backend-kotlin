@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -86,5 +87,10 @@ class UserEntityDetails implements UserDetails, User {
   @Override
   public Set<Recipe> getRecipes() {
     return user.getRecipes();
+  }
+
+  @Override
+  public int compareTo(@NotNull User other) {
+    return User.Companion.getCOMPARATOR().compare(this, other);
   }
 }

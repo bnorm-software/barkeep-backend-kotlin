@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -142,6 +143,11 @@ public class RestBookService extends AbstractRestService implements BookService 
     @Override
     public Set<Recipe> getRecipes() {
       return book.getRecipes();
+    }
+
+    @Override
+    public int compareTo(@NotNull Book other) {
+      return Book.Companion.getCOMPARATOR().compare(this, other);
     }
   }
 }

@@ -5,9 +5,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import com.bnorm.barkeep.model.Component;
 import com.bnorm.barkeep.model.Recipe;
 import com.bnorm.barkeep.service.RecipeService;
-
 
 public class DbRecipeService extends AbstractDbService implements RecipeService {
 
@@ -50,7 +50,7 @@ public class DbRecipeService extends AbstractDbService implements RecipeService 
       recipeEntity.setSource(recipe.getInstructions());
 
       if (recipe.getComponents() != null) {
-        for (com.bnorm.barkeep.model.Component component : recipe.getComponents()) {
+        for (Component component : recipe.getComponents()) {
           ComponentEntity componentEntity = new ComponentEntity();
           componentEntity.setIngredient(find(component.getIngredient()));
           componentEntity.setMin(component.getMin());
@@ -92,7 +92,7 @@ public class DbRecipeService extends AbstractDbService implements RecipeService 
       }
       if (recipe.getComponents() != null) {
         // todo is this right?
-        for (com.bnorm.barkeep.model.Component component : recipe.getComponents()) {
+        for (Component component : recipe.getComponents()) {
           ComponentEntity componentEntity = new ComponentEntity();
           componentEntity.setIngredient(find(component.getIngredient()));
           componentEntity.setMin(component.getMin());

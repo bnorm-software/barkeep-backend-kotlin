@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -143,6 +144,11 @@ public class RestBarService extends AbstractRestService implements BarService {
     @Override
     public Set<Ingredient> getIngredients() {
       return bar.getIngredients();
+    }
+
+    @Override
+    public int compareTo(@NotNull Bar other) {
+      return Bar.Companion.getCOMPARATOR().compare(this, other);
     }
   }
 }

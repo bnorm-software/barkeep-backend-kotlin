@@ -3,6 +3,8 @@ package com.bnorm.barkeep.model;
 
 import javax.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.squareup.moshi.JsonAdapter;
@@ -15,11 +17,18 @@ public abstract class BarValue implements Bar {
     return new AutoValue_BarValue.Builder();
   }
 
-  public static JsonAdapter<BarValue> jsonAdapter(Moshi moshi) { return new AutoValue_BarValue.MoshiJsonAdapter(moshi); }
+  public static JsonAdapter<BarValue> jsonAdapter(Moshi moshi) {
+    return new AutoValue_BarValue.MoshiJsonAdapter(moshi);
+  }
 
   @Override
   @Nullable
   public abstract ImmutableSet<Ingredient> getIngredients();
+
+  @Override
+  public int compareTo(@NotNull Bar other) {
+    return Bar.Companion.getCOMPARATOR().compare(this, other);
+  }
 
   @AutoValue.Builder
   public abstract static class Builder {

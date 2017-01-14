@@ -154,8 +154,9 @@ public abstract class AbstractRestServiceTest {
                      .build();
     };
     OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new CookieInterceptor(url))
-                                                    // .addInterceptor(new WireTraceInterceptor())
-                                                    .authenticator(authenticator).build();
+                                                    .addInterceptor(new WireTraceInterceptor())
+                                                    .authenticator(authenticator)
+                                                    .build();
     Moshi moshi = new Moshi.Builder().add((type, annotations, m) -> {
       if (type.equals(Recipe.class)) {
         return RecipeValue.jsonAdapter(m);

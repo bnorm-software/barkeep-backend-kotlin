@@ -3,8 +3,7 @@ package com.bnorm.barkeep.db
 
 import com.bnorm.barkeep.model.User
 import org.hibernate.annotations.SortNatural
-import java.time.Instant
-import java.util.Date
+import java.time.LocalDateTime
 import java.util.TreeSet
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -17,8 +16,6 @@ import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import javax.persistence.OneToMany
 import javax.persistence.Table
-import javax.persistence.Temporal
-import javax.persistence.TemporalType
 
 @Entity
 @Table(name = "tblUsers")
@@ -44,13 +41,11 @@ class UserEntity : User {
   @Column(name = "email", unique = true, nullable = false)
   override var email: String? = null
 
-  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "createTime", updatable = false)
-  private val createTime: Date? = null
+  private val createTime: LocalDateTime? = null
 
-  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "modifyTime", updatable = false)
-  private val modifyTime: Date? = null
+  private val modifyTime: LocalDateTime? = null
 
   @OneToMany(mappedBy = "owner", orphanRemoval = true)
   @SortNatural
@@ -77,14 +72,6 @@ class UserEntity : User {
   @OneToMany(mappedBy = "owner")
   @SortNatural
   override val recipes: MutableSet<RecipeEntity> = TreeSet()
-
-  fun getCreateTime(): Instant {
-    return createTime!!.toInstant()
-  }
-
-  fun getModifyTime(): Instant {
-    return modifyTime!!.toInstant()
-  }
 
   fun addBar(barEntity: BarEntity) {
     bars.add(barEntity)

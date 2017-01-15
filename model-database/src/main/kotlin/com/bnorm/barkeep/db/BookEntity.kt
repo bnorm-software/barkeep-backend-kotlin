@@ -3,8 +3,7 @@ package com.bnorm.barkeep.db
 
 import com.bnorm.barkeep.model.Book
 import org.hibernate.annotations.SortNatural
-import java.time.Instant
-import java.util.Date
+import java.time.LocalDateTime
 import java.util.TreeSet
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -18,8 +17,6 @@ import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import javax.persistence.PreRemove
 import javax.persistence.Table
-import javax.persistence.Temporal
-import javax.persistence.TemporalType
 
 @Entity
 @Table(name = "tblBooks")
@@ -44,13 +41,11 @@ class BookEntity : Book {
   @Column(name = "active", nullable = false)
   var isActive: Boolean = false
 
-  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "createTime", updatable = false)
-  private val createTime: Date? = null
+  private val createTime: LocalDateTime? = null
 
-  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "modifyTime", updatable = false)
-  private val modifyTime: Date? = null
+  private val modifyTime: LocalDateTime? = null
 
   @ManyToMany(mappedBy = "books")
   @SortNatural
@@ -68,14 +63,6 @@ class BookEntity : Book {
     for (userEntity in users) {
       userEntity.removeBook(this)
     }
-  }
-
-  fun getCreateTime(): Instant {
-    return createTime!!.toInstant()
-  }
-
-  fun getModifyTime(): Instant {
-    return modifyTime!!.toInstant()
   }
 
   fun addRecipe(recipe: RecipeEntity) {

@@ -2,8 +2,7 @@
 package com.bnorm.barkeep.db
 
 import com.bnorm.barkeep.model.Ingredient
-import java.time.Instant
-import java.util.Date
+import java.time.LocalDateTime
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -13,8 +12,6 @@ import javax.persistence.ManyToOne
 import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import javax.persistence.Table
-import javax.persistence.Temporal
-import javax.persistence.TemporalType
 
 @Entity
 @Table(name = "tblIngredients")
@@ -33,20 +30,9 @@ class IngredientEntity : Ingredient {
   @JoinColumn(name = "parent", referencedColumnName = "id")
   override var parent: IngredientEntity? = null
 
-  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "createTime", updatable = false)
-  private val createTime: Date? = null
+  private val createTime: LocalDateTime? = null
 
-  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "modifyTime", updatable = false)
-  private val modifyTime: Date? = null
-
-
-  fun getCreateTime(): Instant {
-    return createTime!!.toInstant()
-  }
-
-  fun getModifyTime(): Instant {
-    return modifyTime!!.toInstant()
-  }
+  private val modifyTime: LocalDateTime? = null
 }

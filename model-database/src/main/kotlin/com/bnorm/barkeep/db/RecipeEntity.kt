@@ -3,8 +3,7 @@ package com.bnorm.barkeep.db
 
 import com.bnorm.barkeep.model.Recipe
 import org.hibernate.annotations.SortNatural
-import java.time.Instant
-import java.util.Date
+import java.time.LocalDateTime
 import java.util.TreeSet
 import javax.persistence.CollectionTable
 import javax.persistence.Column
@@ -20,8 +19,6 @@ import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import javax.persistence.PreRemove
 import javax.persistence.Table
-import javax.persistence.Temporal
-import javax.persistence.TemporalType
 
 @Entity
 @Table(name = "tblRecipes")
@@ -52,13 +49,11 @@ class RecipeEntity : Recipe {
   @Column(name = "source")
   override var source: String? = null
 
-  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "createTime", updatable = false)
-  private val createTime: Date? = null
+  private val createTime: LocalDateTime? = null
 
-  @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "modifyTime", updatable = false)
-  private val modifyTime: Date? = null
+  private val modifyTime: LocalDateTime? = null
 
   @ElementCollection
   @CollectionTable(name = "tblRecipeComponents", joinColumns = arrayOf(JoinColumn(name = "recipe")))
@@ -81,14 +76,6 @@ class RecipeEntity : Recipe {
     for (userEntity in users) {
       userEntity.removeRecipe(this)
     }
-  }
-
-  fun getCreateTime(): Instant {
-    return createTime!!.toInstant()
-  }
-
-  fun getModifyTime(): Instant {
-    return modifyTime!!.toInstant()
   }
 
   fun addComponent(componentEntity: ComponentEntity) {

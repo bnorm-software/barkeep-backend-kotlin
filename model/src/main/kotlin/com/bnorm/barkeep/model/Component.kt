@@ -9,20 +9,20 @@ import java.util.function.Function
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 interface Component : Comparable<Component> {
 
+  @get:JsonView(Any::class)
   val ingredient: Ingredient?
-    @JsonView(Any::class) get
 
+  @get:JsonView(Any::class)
   val min: Double
-    @JsonView(Any::class) get
 
+  @get:JsonView(Any::class)
   val max: Double?
-    @JsonView(Any::class) get
 
+  @get:JsonView(Any::class)
   val componentNum: Long
-    @JsonView(Any::class) get
 
+  @get:JsonView(Any::class)
   val order: Long
-    @JsonView(Any::class) get
 
   override fun compareTo(other: Component): Int {
     return COMPARATOR.compare(this, other)

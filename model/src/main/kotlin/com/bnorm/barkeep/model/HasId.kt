@@ -6,8 +6,8 @@ import java.util.function.Function
 
 interface HasId {
 
+  @get:JsonView(HasId::class)
   val id: Long?
-    @JsonView(HasId::class) get
 
   companion object {
 

@@ -7,26 +7,26 @@ import com.fasterxml.jackson.annotation.JsonView
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 interface Recipe : HasId, Comparable<Recipe> {
 
+  @get:JsonView(Recipe::class, Book::class)
   val title: String?
-    @JsonView(Recipe::class, Book::class) get
 
+  @get:JsonView(Recipe::class, Book::class)
   val description: String?
-    @JsonView(Recipe::class, Book::class) get
 
+  @get:JsonView(Recipe::class)
   val owner: User?
-    @JsonView(Recipe::class) get
 
+  @get:JsonView(Recipe::class, Book::class)
   val imageUrl: String?
-    @JsonView(Recipe::class, Book::class) get
 
+  @get:JsonView(Recipe::class)
   val instructions: String?
-    @JsonView(Recipe::class) get
 
+  @get:JsonView(Recipe::class)
   val source: String?
-    @JsonView(Recipe::class) get
 
+  @get:JsonView(Recipe::class)
   val components: Set<Component>?
-    @JsonView(Recipe::class) get
 
   override fun compareTo(other: Recipe): Int {
     return HasId.COMPARATOR.compare(this, other)

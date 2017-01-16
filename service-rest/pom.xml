@@ -79,7 +79,10 @@
       <scope>test</scope>
     </dependency>
 
-
+    <dependency>
+      <groupId>io.kotlintest</groupId>
+      <artifactId>kotlintest</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.squareup.retrofit2</groupId>
       <artifactId>retrofit</artifactId>
@@ -96,10 +99,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

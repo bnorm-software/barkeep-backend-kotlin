@@ -223,8 +223,8 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   fun getBars_successful_multiple() {
     // given
     val bar1 = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
-    val bar2 = service.createBar(BarValue(title = "Bar2", description = "Description2", owner = joeTestmore))
     val bar3 = service.createBar(BarValue(title = "Bar3", description = "Description3", owner = joeTestmore))
+    val bar2 = service.createBar(BarValue(title = "Bar2", description = "Description2", owner = joeTestmore))
 
     // when
     val response = service.getBars()

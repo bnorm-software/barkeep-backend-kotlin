@@ -24,7 +24,7 @@
     <module>service</module>
     <module>service-database</module>
     <module>service-rest</module>
-    <module>service-web</module>
+    <!--<module>service-web</module>-->
   </modules>
 
   <properties>

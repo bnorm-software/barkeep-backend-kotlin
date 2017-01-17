@@ -20,6 +20,11 @@
       <artifactId>model-value</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>com.bnorm.barkeep</groupId>
+      <artifactId>model-bean</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>com.squareup.retrofit2</groupId>
@@ -43,11 +48,6 @@
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-spring-boot-starter</artifactId>
       <version>1.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.peimari</groupId>
-      <artifactId>maddon</artifactId>
-      <version>1.15</version>
     </dependency>
 
     <!--<dependency>-->

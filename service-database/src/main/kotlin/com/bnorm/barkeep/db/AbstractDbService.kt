@@ -32,20 +32,10 @@ abstract class AbstractDbService(val em: EntityManager) {
     return entity ?: throw IllegalArgumentException("Cannot find $name with id=%$id")
   }
 
-  fun requireMatch(hasId: HasId, id: Long, name: String) {
-    if (hasId.id != null && hasId.id != id) {
-      throw IllegalArgumentException("Cannot update $name with a different id=$hasId.id then existing id=$id")
-    }
-  }
-
   // ===== User ===== //
 
   fun find(user: User): UserEntity? {
     return user as? UserEntity ?: findUser(user.id)
-  }
-
-  fun findUser(id: Long?): UserEntity? {
-    return id?.let { findUser(it) }
   }
 
   fun findUser(id: Long): UserEntity? {
@@ -60,10 +50,6 @@ abstract class AbstractDbService(val em: EntityManager) {
 
   fun find(ingredient: Ingredient): IngredientEntity? {
     return ingredient as? IngredientEntity ?: findIngredient(ingredient.id)
-  }
-
-  fun findIngredient(id: Long?): IngredientEntity? {
-    return id?.let { findIngredient(it) }
   }
 
   fun findIngredient(id: Long): IngredientEntity? {
@@ -85,10 +71,6 @@ abstract class AbstractDbService(val em: EntityManager) {
     return findBar(bar.id)
   }
 
-  fun findBar(id: Long?): BarEntity? {
-    return if (id == null) null else findBar(id)
-  }
-
   fun findBar(id: Long): BarEntity? {
     return em.find(BarEntity::class.java, id)
   }
@@ -105,10 +87,6 @@ abstract class AbstractDbService(val em: EntityManager) {
 
   fun find(book: Book): BookEntity? {
     return findBook(book.id)
-  }
-
-  fun findBook(id: Long?): BookEntity? {
-    return id?.let { findBook(it) }
   }
 
   fun findBook(id: Long): BookEntity? {
@@ -131,10 +109,6 @@ abstract class AbstractDbService(val em: EntityManager) {
 
   fun findRecipe(id: Long): RecipeEntity? {
     return em.find(RecipeEntity::class.java, id)
-  }
-
-  fun findRecipe(id: Long?): RecipeEntity? {
-    return id?.let { findRecipe(it) }
   }
 
   open fun getRecipes(): List<Recipe> {

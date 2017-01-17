@@ -9,7 +9,7 @@ import javax.persistence.EntityManager
 class DbIngredientService(entityManager: EntityManager) : AbstractDbService(entityManager), IngredientService {
 
   private fun parentEntity(ingredient: IngredientSpec): IngredientEntity? {
-    return ingredient.parent?.id.let { findIngredient(it) }
+    return ingredient.parent?.id?.let { findIngredient(it) }
   }
 
   override fun getIngredients(): List<Ingredient> {

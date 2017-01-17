@@ -3,24 +3,13 @@ package com.bnorm.barkeep.rest
 
 import com.bnorm.barkeep.RestApplication
 import com.bnorm.barkeep.db.DbUserService
-import com.bnorm.barkeep.model.Bar
-import com.bnorm.barkeep.model.BarSpec
-import com.bnorm.barkeep.model.BarValue
-import com.bnorm.barkeep.model.Book
-import com.bnorm.barkeep.model.BookSpec
-import com.bnorm.barkeep.model.BookValue
-import com.bnorm.barkeep.model.Component
-import com.bnorm.barkeep.model.ComponentValue
-import com.bnorm.barkeep.model.Ingredient
-import com.bnorm.barkeep.model.IngredientSpec
-import com.bnorm.barkeep.model.IngredientValue
-import com.bnorm.barkeep.model.Recipe
-import com.bnorm.barkeep.model.RecipeSpec
-import com.bnorm.barkeep.model.RecipeValue
-import com.bnorm.barkeep.model.User
-import com.bnorm.barkeep.model.UserSpec
+import com.bnorm.barkeep.model.BarValueAdapter
+import com.bnorm.barkeep.model.BookValueAdapter
+import com.bnorm.barkeep.model.ComponentValueAdapter
+import com.bnorm.barkeep.model.IngredientValueAdapter
+import com.bnorm.barkeep.model.RecipeValueAdapter
 import com.bnorm.barkeep.model.UserValue
-import com.squareup.moshi.JsonAdapter
+import com.bnorm.barkeep.model.UserValueAdapter
 import com.squareup.moshi.Moshi
 import io.kotlintest.matchers.Matcher
 import io.kotlintest.matchers.Matchers
@@ -78,11 +67,7 @@ abstract class AbstractRestServiceTest : Matchers {
     internal val CODE_UNAUTHORIZED = 401
     internal val CODE_NOT_FOUND = 404
 
-    internal val TEST_USER: User = UserValue.builder()
-            .setUsername("joe")
-            .setPassword("testmore")
-            .setEmail("joe@test.more")
-            .build()
+    internal val TEST_USER = UserValue(username = "joe", password = "testmore", email = "joe@test.more")
 
     @BeforeClass
     @JvmStatic
@@ -101,11 +86,7 @@ abstract class AbstractRestServiceTest : Matchers {
       val userService = DbUserService(em)
 
       val passwordEncoder = BCryptPasswordEncoder()
-      userService.createUser(UserValue.builder()
-                                     .setUsername(TEST_USER.username)
-                                     .setPassword(passwordEncoder.encode(TEST_USER.password!!))
-                                     .setEmail(TEST_USER.email)
-                                     .build())
+      userService.createUser(TEST_USER.copy(password = passwordEncoder.encode(TEST_USER.password!!)))
     }
   }
 
@@ -152,23 +133,14 @@ abstract class AbstractRestServiceTest : Matchers {
             // .addInterceptor(WireTraceInterceptor())
             .authenticator(authenticator)
             .build()
-    val moshi = Moshi.Builder().add(JsonAdapter.Factory { type, annotations, m ->
-      if (type == Recipe::class.java || type == RecipeSpec::class.java) {
-        return@Factory RecipeValue.jsonAdapter(m)
-      } else if (type == Bar::class.java || type == BarSpec::class.java) {
-        return@Factory BarValue.jsonAdapter(m)
-      } else if (type == Book::class.java || type == BookSpec::class.java) {
-        return@Factory BookValue.jsonAdapter(m)
-      } else if (type == Ingredient::class.java || type == IngredientSpec::class.java) {
-        return@Factory IngredientValue.jsonAdapter(m)
-      } else if (type == Component::class.java) {
-        return@Factory ComponentValue.jsonAdapter(m)
-      } else if (type == User::class.java || type == UserSpec::class.java) {
-        return@Factory UserValue.jsonAdapter(m)
-      } else {
-        return@Factory null
-      }
-    }).add(ImmutableSetAdapter.FACTORY).build()
+    val moshi = Moshi.Builder()
+            .add(BarValueAdapter)
+            .add(BookValueAdapter)
+            .add(ComponentValueAdapter)
+            .add(IngredientValueAdapter)
+            .add(RecipeValueAdapter)
+            .add(UserValueAdapter)
+            .build()
     val retrofit = Retrofit.Builder().baseUrl(url)
             .client(client)
             .addConverterFactory(MoshiConverterFactory.create(moshi))

@@ -8,17 +8,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bnorm.barkeep.model.Bar;
-import com.bnorm.barkeep.model.BarValue;
+import com.bnorm.barkeep.model.BarSpec;
 import com.bnorm.barkeep.model.Book;
-import com.bnorm.barkeep.model.BookValue;
+import com.bnorm.barkeep.model.BookSpec;
 import com.bnorm.barkeep.model.Component;
-import com.bnorm.barkeep.model.ComponentValue;
 import com.bnorm.barkeep.model.Ingredient;
-import com.bnorm.barkeep.model.IngredientValue;
+import com.bnorm.barkeep.model.IngredientSpec;
 import com.bnorm.barkeep.model.Recipe;
-import com.bnorm.barkeep.model.RecipeValue;
+import com.bnorm.barkeep.model.RecipeSpec;
 import com.bnorm.barkeep.model.User;
-import com.bnorm.barkeep.model.UserValue;
+import com.bnorm.barkeep.model.UserSpec;
+import com.bnorm.barkeep.model.bean.BarBean;
+import com.bnorm.barkeep.model.bean.BookBean;
+import com.bnorm.barkeep.model.bean.ComponentBean;
+import com.bnorm.barkeep.model.bean.IngredientBean;
+import com.bnorm.barkeep.model.bean.RecipeBean;
+import com.bnorm.barkeep.model.bean.UserBean;
 import com.bnorm.barkeep.web.event.DashboardEvent;
 import com.bnorm.barkeep.web.event.DashboardEventBus;
 import com.bnorm.barkeep.web.view.LoginView;
@@ -143,18 +148,18 @@ public class RootUi extends UI {
                                                     // .addInterceptor(new WireTraceInterceptor())
                                                     .authenticator(authenticator).build();
     Moshi moshi = new Moshi.Builder().add((type, annotations, m) -> {
-      if (type.equals(Recipe.class)) {
-        return RecipeValue.jsonAdapter(m);
-      } else if (type.equals(Bar.class)) {
-        return BarValue.jsonAdapter(m);
-      } else if (type.equals(Book.class)) {
-        return BookValue.jsonAdapter(m);
-      } else if (type.equals(Ingredient.class)) {
-        return IngredientValue.jsonAdapter(m);
-      } else if (type.equals(Component.class)) {
-        return ComponentValue.jsonAdapter(m);
-      } else if (type.equals(User.class)) {
-        return UserValue.jsonAdapter(m);
+      if (type == Recipe.class || type == RecipeSpec.class) {
+        return m.adapter(RecipeBean.class);
+      } else if (type == Bar.class || type == BarSpec.class) {
+        return m.adapter(BarBean.class);
+      } else if (type == Book.class || type == BookSpec.class) {
+        return m.adapter(BookBean.class);
+      } else if (type == Ingredient.class || type == IngredientSpec.class) {
+        return m.adapter(IngredientBean.class);
+      } else if (type == Component.class) {
+        return m.adapter(ComponentBean.class);
+      } else if (type == User.class || type == UserSpec.class) {
+        return m.adapter(UserBean.class);
       } else {
         return null;
       }

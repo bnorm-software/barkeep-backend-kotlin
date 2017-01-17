@@ -4,17 +4,6 @@ package com.bnorm.barkeep.model
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonView
 
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-interface Book : BookSpec, HasId, Comparable<Book> {
-
-  @get:JsonView(Book::class)
-  val recipes: Set<Recipe>?
-
-  override fun compareTo(other: Book): Int {
-    return HasId.COMPARATOR.compare(this, other)
-  }
-}
-
 interface BookSpec {
 
   @get:JsonView(Book::class, User::class)
@@ -25,4 +14,15 @@ interface BookSpec {
 
   @get:JsonView(Book::class)
   val owner: User?
+}
+
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+interface Book : BookSpec, HasId, Comparable<Book> {
+
+  @get:JsonView(Book::class)
+  val recipes: Set<Recipe>?
+
+  override fun compareTo(other: Book): Int {
+    return HasId.COMPARATOR.compare(this, other)
+  }
 }

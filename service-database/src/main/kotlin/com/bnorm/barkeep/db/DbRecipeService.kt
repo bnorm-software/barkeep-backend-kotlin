@@ -2,6 +2,7 @@
 package com.bnorm.barkeep.db
 
 import com.bnorm.barkeep.model.Recipe
+import com.bnorm.barkeep.model.RecipeSpec
 import com.bnorm.barkeep.service.RecipeService
 import javax.persistence.EntityManager
 
@@ -15,10 +16,8 @@ class DbRecipeService(entityManager: EntityManager) : AbstractDbService(entityMa
     return super.getRecipe(id)
   }
 
-  override fun createRecipe(recipe: Recipe): RecipeEntity {
-    if (recipe.id != null) {
-      throw IllegalArgumentException("Cannot create recipe that already has an id=$recipe.id")
-    } else if (recipe.owner == null) {
+  override fun createRecipe(recipe: RecipeSpec): RecipeEntity {
+    if (recipe.owner == null) {
       throw IllegalArgumentException("Cannot create recipe without an owner")
     }
     val userEntity = find(recipe.owner!!) ?: throw IllegalArgumentException("Cannot create recipe with an unknown owner id=$recipe.owner!!.id")
@@ -52,9 +51,8 @@ class DbRecipeService(entityManager: EntityManager) : AbstractDbService(entityMa
     return recipeEntity
   }
 
-  override fun setRecipe(id: Long, recipe: Recipe): RecipeEntity {
+  override fun setRecipe(id: Long, recipe: RecipeSpec): RecipeEntity {
     val recipeEntity = requireExists(findRecipe(id), id, "recipe")
-    requireMatch(recipe, id, "recipe")
 
     txn {
       if (recipe.title != null) {

@@ -16,7 +16,7 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val bars = service.getBars().execute().body()
     if (bars != null) {
       for (bar in bars) {
-        service.deleteBar(bar.id!!).execute()
+        service.deleteBar(bar.id).execute()
       }
     }
   }
@@ -37,27 +37,9 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     // then
     assertThat(response.isSuccessful()).isTrue()
     assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id!! should beValid
+    response.body().id should beValid
     response.body().title shouldBe bar.title
     response.body().description shouldBe bar.description
-  }
-
-  @Test
-  @Throws(Exception::class)
-  fun createBar_failure_badId() {
-    // given
-    val bar = BarValue.builder()
-            .setId(1L)
-            .setTitle("Bar1")
-            .setDescription("Description1")
-            .build()
-
-    // when
-    val response = service.createBar(bar).execute()
-
-    // then
-    assertThat(response.isSuccessful()).isFalse()
-    assertThat(response.raw().code()).isEqualTo(BAD_REQUEST)
   }
 
 
@@ -77,7 +59,7 @@ class RestBarServiceTest : AbstractRestServiceTest() {
             .body()
 
     // when
-    val response = service.getBar(bar.id!!).execute()
+    val response = service.getBar(bar.id).execute()
 
     // then
     assertThat(response.isSuccessful()).isTrue()
@@ -117,7 +99,7 @@ class RestBarServiceTest : AbstractRestServiceTest() {
             .body()
 
     // when
-    val response = service.updateBar(bar.id!!,
+    val response = service.updateBar(bar.id,
                                      BarValue.builder()
                                              .setTitle("Bar2")
                                              .build()).execute()
@@ -142,7 +124,7 @@ class RestBarServiceTest : AbstractRestServiceTest() {
             .body()
 
     // when
-    val response = service.updateBar(bar.id!!,
+    val response = service.updateBar(bar.id,
                                      BarValue.builder()
                                              .setTitle("Bar2")
                                              .setDescription("Description2")
@@ -187,7 +169,7 @@ class RestBarServiceTest : AbstractRestServiceTest() {
             .body()
 
     // when
-    val response = service.deleteBar(bar1.id!!).execute()
+    val response = service.deleteBar(bar1.id).execute()
 
     // then
     assertThat(response.isSuccessful()).isTrue()
@@ -233,7 +215,7 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val bar1 = service.createBar(BarValue.builder().setTitle("Bar1").setDescription("Description1").build())
             .execute()
             .body()
-    service.deleteBar(bar1.id!!).execute()
+    service.deleteBar(bar1.id).execute()
 
     // when
     val response = service.getBars().execute()
@@ -275,8 +257,8 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val bar3 = service.createBar(BarValue.builder().setTitle("Bar3").setDescription("Description3").build())
             .execute()
             .body()
-    service.deleteBar(bar1.id!!).execute()
-    service.deleteBar(bar3.id!!).execute()
+    service.deleteBar(bar1.id).execute()
+    service.deleteBar(bar3.id).execute()
 
     // when
     val response = service.getBars().execute()
@@ -331,8 +313,8 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val bar1 = service.createBar(BarValue.builder().setTitle("Bar1").setDescription("Description1").build())
             .execute()
             .body()
-    service.deleteBar(bar4.id!!).execute()
-    service.deleteBar(bar2.id!!).execute()
+    service.deleteBar(bar4.id).execute()
+    service.deleteBar(bar2.id).execute()
 
     // when
     val response = service.getBars().execute()

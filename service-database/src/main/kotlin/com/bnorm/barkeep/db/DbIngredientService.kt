@@ -2,12 +2,13 @@
 package com.bnorm.barkeep.db
 
 import com.bnorm.barkeep.model.Ingredient
+import com.bnorm.barkeep.model.IngredientSpec
 import com.bnorm.barkeep.service.IngredientService
 import javax.persistence.EntityManager
 
 class DbIngredientService(entityManager: EntityManager) : AbstractDbService(entityManager), IngredientService {
 
-  private fun parentEntity(ingredient: Ingredient): IngredientEntity? {
+  private fun parentEntity(ingredient: IngredientSpec): IngredientEntity? {
     return ingredient.parent?.id.let { findIngredient(it) }
   }
 
@@ -19,10 +20,7 @@ class DbIngredientService(entityManager: EntityManager) : AbstractDbService(enti
     return super.getIngredient(id)
   }
 
-  override fun createIngredient(ingredient: Ingredient): IngredientEntity {
-    if (ingredient.id != null) {
-      throw IllegalArgumentException("Cannot create ingredient that already has an id=$ingredient.id")
-    }
+  override fun createIngredient(ingredient: IngredientSpec): IngredientEntity {
     val parentEntity = parentEntity(ingredient)
     // todo check parentEntity exists if needed
 
@@ -38,9 +36,8 @@ class DbIngredientService(entityManager: EntityManager) : AbstractDbService(enti
     return ingredientEntity
   }
 
-  override fun setIngredient(id: Long, ingredient: Ingredient): IngredientEntity {
+  override fun setIngredient(id: Long, ingredient: IngredientSpec): IngredientEntity {
     val ingredientEntity = requireExists(findIngredient(id), id, "ingredient")
-    requireMatch(ingredient, id, "ingredient")
 
     txn {
       if (ingredient.title != null) {

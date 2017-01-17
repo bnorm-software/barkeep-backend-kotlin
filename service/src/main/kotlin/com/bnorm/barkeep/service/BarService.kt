@@ -2,6 +2,7 @@
 package com.bnorm.barkeep.service
 
 import com.bnorm.barkeep.model.Bar
+import com.bnorm.barkeep.model.BarSpec
 
 interface BarService {
 
@@ -9,9 +10,9 @@ interface BarService {
 
   fun getBar(id: Long): Bar?
 
-  fun createBar(bar: Bar): Bar
+  fun createBar(bar: BarSpec): Bar
 
-  fun setBar(id: Long, bar: Bar): Bar
+  fun setBar(id: Long, bar: BarSpec): Bar
 
   fun deleteBar(id: Long)
 }

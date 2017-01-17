@@ -2,6 +2,7 @@
 package com.bnorm.barkeep.service
 
 import com.bnorm.barkeep.model.Recipe
+import com.bnorm.barkeep.model.RecipeSpec
 
 interface RecipeService {
 
@@ -9,9 +10,9 @@ interface RecipeService {
 
   fun getRecipe(id: Long): Recipe?
 
-  fun createRecipe(recipe: Recipe): Recipe
+  fun createRecipe(recipe: RecipeSpec): Recipe
 
-  fun setRecipe(id: Long, recipe: Recipe): Recipe
+  fun setRecipe(id: Long, recipe: RecipeSpec): Recipe
 
   fun deleteRecipe(id: Long)
 }

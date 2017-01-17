@@ -5,10 +5,10 @@ import com.bnorm.barkeep.db.DbRecipeService
 import com.bnorm.barkeep.db.DbUserService
 import com.bnorm.barkeep.model.Component
 import com.bnorm.barkeep.model.Recipe
+import com.bnorm.barkeep.model.RecipeSpec
 import com.bnorm.barkeep.model.User
 import com.bnorm.barkeep.service.RecipeService
 import com.fasterxml.jackson.annotation.JsonView
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,10 +17,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/recipes")
-class RestRecipeService
-@Autowired
-constructor(private val userService: DbUserService,
-            private val recipeService: DbRecipeService) : AbstractRestService(), RecipeService {
+class RestRecipeService(private val userService: DbUserService,
+                        private val recipeService: DbRecipeService) : AbstractRestService(), RecipeService {
 
   private fun findByOwner(userId: Long, recipeId: Long): Recipe {
     val recipe = recipeService.getRecipe(recipeId)
@@ -42,27 +40,24 @@ constructor(private val userService: DbUserService,
   @JsonView(Recipe::class)
   @RequestMapping(method = arrayOf(RequestMethod.GET))
   override fun getRecipes(): Collection<Recipe> {
-    val user = userService.getUser(currentUser().id!!)
+    val user = userService.getUser(currentUser().id)
     return user!!.recipes
   }
 
   @JsonView(Recipe::class)
   @RequestMapping(value = "/{recipeId}", method = arrayOf(RequestMethod.GET))
   override fun getRecipe(@PathVariable("recipeId") id: Long): Recipe? {
-    val user = userService.getUser(currentUser().id!!)
+    val user = userService.getUser(currentUser().id)
     return findByUser(user, id)
   }
 
   @JsonView(Recipe::class)
   @RequestMapping(method = arrayOf(RequestMethod.POST))
-  override fun createRecipe(@RequestBody recipe: Recipe): Recipe {
-    if (recipe.id != null) {
-      throw BadRequest("Cannot create recipe with existing id=$recipe.id")
-    }
+  override fun createRecipe(@RequestBody recipe: RecipeSpec): Recipe {
     val currentUser = currentUser()
     if (recipe.owner == null) {
       return recipeService.createRecipe(RecipeWithOwner(recipe, currentUser))
-    } else if (!isOwnedBy(recipe, currentUser.id!!)) {
+    } else if (!isOwnedBy(recipe, currentUser.id)) {
       throw BadRequest("Cannot create recipe owned by another user")
     } else {
       return recipeService.createRecipe(recipe)
@@ -71,20 +66,18 @@ constructor(private val userService: DbUserService,
 
   @JsonView(Recipe::class)
   @RequestMapping(value = "/{recipeId}", method = arrayOf(RequestMethod.PUT))
-  override fun setRecipe(@PathVariable("recipeId") id: Long, @RequestBody recipe: Recipe): Recipe {
-    findByOwner(currentUser().id!!, id)
+  override fun setRecipe(@PathVariable("recipeId") id: Long, @RequestBody recipe: RecipeSpec): Recipe {
+    findByOwner(currentUser().id, id)
     return recipeService.setRecipe(id, recipe)
   }
 
   @RequestMapping(value = "/{recipeId}", method = arrayOf(RequestMethod.DELETE))
   override fun deleteRecipe(@PathVariable("recipeId") id: Long) {
-    findByOwner(currentUser().id!!, id)
+    findByOwner(currentUser().id, id)
     recipeService.deleteRecipe(id)
   }
 
-  private class RecipeWithOwner(private val recipe: Recipe, override val owner: User) : Recipe {
-    override val id: Long?
-      get() = recipe.id
+  private class RecipeWithOwner(private val recipe: RecipeSpec, override val owner: User) : RecipeSpec {
     override val title: String?
       get() = recipe.title
     override val description: String?

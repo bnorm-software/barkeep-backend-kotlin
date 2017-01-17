@@ -7,7 +7,7 @@ import com.bnorm.barkeep.model.User
 
 class RecipeBean : Recipe {
 
-  override var id: Long? = null
+  override var id: Long = -1
   override var title: String? = null
   override var description: String? = null
   override var owner: User? = null

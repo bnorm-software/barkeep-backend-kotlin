@@ -8,7 +8,7 @@ import com.bnorm.barkeep.model.User
 
 class UserBean : User {
 
-  override var id: Long? = null
+  override var id: Long = -1
   override var username: String? = null
   override var password: String? = null
   override var displayName: String? = null

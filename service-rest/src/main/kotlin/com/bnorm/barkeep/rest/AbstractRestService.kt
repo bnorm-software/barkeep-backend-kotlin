@@ -1,9 +1,9 @@
 // Copyright 2017 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.rest
 
-import com.bnorm.barkeep.model.Bar
-import com.bnorm.barkeep.model.Book
-import com.bnorm.barkeep.model.Recipe
+import com.bnorm.barkeep.model.BarSpec
+import com.bnorm.barkeep.model.BookSpec
+import com.bnorm.barkeep.model.RecipeSpec
 import com.bnorm.barkeep.model.User
 import com.bnorm.barkeep.security.UserEntityDetails
 import org.springframework.http.HttpStatus
@@ -23,15 +23,15 @@ abstract class AbstractRestService {
     return (SecurityContextHolder.getContext().authentication.principal as UserEntityDetails).user
   }
 
-  fun isOwnedBy(bar: Bar?, userId: Long): Boolean {
+  fun isOwnedBy(bar: BarSpec?, userId: Long): Boolean {
     return bar?.owner?.id == userId
   }
 
-  fun isOwnedBy(book: Book?, userId: Long): Boolean {
+  fun isOwnedBy(book: BookSpec?, userId: Long): Boolean {
     return book?.owner?.id == userId
   }
 
-  fun isOwnedBy(recipe: Recipe?, userId: Long): Boolean {
+  fun isOwnedBy(recipe: RecipeSpec?, userId: Long): Boolean {
     return recipe?.owner?.id == userId
   }
 }

@@ -2,6 +2,7 @@
 package com.bnorm.barkeep.db
 
 import com.bnorm.barkeep.model.Bar
+import com.bnorm.barkeep.model.BarSpec
 import com.bnorm.barkeep.service.BarService
 import javax.persistence.EntityManager
 
@@ -15,10 +16,8 @@ class DbBarService(entityManager: EntityManager) : AbstractDbService(entityManag
     return super.getBar(id)
   }
 
-  override fun createBar(bar: Bar): BarEntity {
-    if (bar.id != null) {
-      throw IllegalArgumentException("Cannot create bar that already has an id=$bar.id")
-    } else if (bar.owner == null) {
+  override fun createBar(bar: BarSpec): BarEntity {
+    if (bar.owner == null) {
       throw IllegalArgumentException("Cannot create bar without an owner")
     }
     val userEntity = find(bar.owner!!) ?: throw IllegalArgumentException(String.format("Cannot create bar with an unknown owner id=%d",
@@ -29,11 +28,6 @@ class DbBarService(entityManager: EntityManager) : AbstractDbService(entityManag
     barEntity.description = bar.description
     barEntity.owner = userEntity
     barEntity.addUser(userEntity)
-    if (bar.ingredients != null) {
-      for (ingredient in bar.ingredients!!) {
-        barEntity.addIngredient(find(ingredient)!!)
-      }
-    }
 
     txn {
       em.persist(barEntity)
@@ -42,9 +36,8 @@ class DbBarService(entityManager: EntityManager) : AbstractDbService(entityManag
     return barEntity
   }
 
-  override fun setBar(id: Long, bar: Bar): BarEntity {
+  override fun setBar(id: Long, bar: BarSpec): BarEntity {
     val barEntity = requireExists(findBar(id), id, "bar")
-    requireMatch(bar, id, "bar")
 
     txn {
       if (bar.title != null) {
@@ -55,12 +48,6 @@ class DbBarService(entityManager: EntityManager) : AbstractDbService(entityManag
       }
       if (bar.owner != null) {
         barEntity.owner = find(bar.owner!!)
-      }
-      if (bar.ingredients != null) {
-        // todo is this correct?
-        for (ingredient in bar.ingredients!!) {
-          barEntity.addIngredient(find(ingredient)!!)
-        }
       }
     }
 

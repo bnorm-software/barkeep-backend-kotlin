@@ -17,7 +17,7 @@ class DbBookServiceTest : AbstractDbServiceTest() {
   fun cleanup() {
     val books = service.getBooks()
     for (book in books) {
-      service.deleteBook(book.id!!)
+      service.deleteBook(book.id)
     }
   }
 
@@ -38,27 +38,6 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     response.id should beValid
     response.title shouldBe "Book1"
     response.description shouldBe "Description1"
-  }
-
-  @Test
-  @Throws(Exception::class)
-  fun createBook_failure_badId() {
-    // given
-    val book = BookValue.builder()
-            .setId(1L)
-            .setTitle("Book1")
-            .setDescription("Description1")
-            .setOwner(joeTestmore)
-            .build()
-
-    try {
-      // when
-      service.createBook(book)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "already has an id"
-    }
   }
 
 

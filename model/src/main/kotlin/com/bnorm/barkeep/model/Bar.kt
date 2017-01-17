@@ -5,7 +5,17 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonView
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-interface Bar : HasId, Comparable<Bar> {
+interface Bar : BarSpec, HasId, Comparable<Bar> {
+
+  @get:JsonView(Bar::class)
+  val ingredients: Set<Ingredient>?
+
+  override fun compareTo(other: Bar): Int {
+    return HasId.COMPARATOR.compare(this, other)
+  }
+}
+
+interface BarSpec {
 
   @get:JsonView(Bar::class, User::class)
   val title: String?
@@ -15,11 +25,4 @@ interface Bar : HasId, Comparable<Bar> {
 
   @get:JsonView(Bar::class)
   val owner: User?
-
-  @get:JsonView(Bar::class)
-  val ingredients: Set<Ingredient>?
-
-  override fun compareTo(other: Bar): Int {
-    return HasId.COMPARATOR.compare(this, other)
-  }
 }

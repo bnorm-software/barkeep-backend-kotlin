@@ -4,6 +4,7 @@ package com.bnorm.barkeep.rest
 import com.bnorm.barkeep.db.DbBarService
 import com.bnorm.barkeep.db.DbUserService
 import com.bnorm.barkeep.model.Bar
+import com.bnorm.barkeep.model.BarSpec
 import com.bnorm.barkeep.model.Ingredient
 import com.bnorm.barkeep.model.Recipe
 import com.bnorm.barkeep.model.User
@@ -43,14 +44,14 @@ class RestBarService(private val userService: DbUserService,
   @JsonView(Bar::class)
   @GetMapping
   override fun getBars(): Collection<Bar> {
-    val user = userService.getUser(currentUser().id!!)
+    val user = userService.getUser(currentUser().id)
     return user!!.bars
   }
 
   @JsonView(Bar::class)
   @GetMapping("/{barId}")
   override fun getBar(@PathVariable("barId") id: Long): Bar? {
-    val user = userService.getUser(currentUser().id!!)
+    val user = userService.getUser(currentUser().id)
     return findByUser(user, id)
   }
 
@@ -63,14 +64,11 @@ class RestBarService(private val userService: DbUserService,
 
   @JsonView(Bar::class)
   @PostMapping
-  override fun createBar(@RequestBody bar: Bar): Bar {
-    if (bar.id != null) {
-      throw BadRequest("Cannot create bar with existing id=$bar.id")
-    }
+  override fun createBar(@RequestBody bar: BarSpec): Bar {
     val currentUser = currentUser()
     if (bar.owner == null) {
       return barService.createBar(BarWithOwner(bar, currentUser))
-    } else if (!isOwnedBy(bar, currentUser.id!!)) {
+    } else if (!isOwnedBy(bar, currentUser.id)) {
       throw BadRequest("Cannot create bar owned by another user")
     } else {
       return barService.createBar(bar)
@@ -79,25 +77,21 @@ class RestBarService(private val userService: DbUserService,
 
   @JsonView(Bar::class)
   @PutMapping("/{barId}")
-  override fun setBar(@PathVariable("barId") id: Long, @RequestBody bar: Bar): Bar {
-    findByOwner(currentUser().id!!, id)
+  override fun setBar(@PathVariable("barId") id: Long, @RequestBody bar: BarSpec): Bar {
+    findByOwner(currentUser().id, id)
     return barService.setBar(id, bar)
   }
 
   @DeleteMapping("/{barId}")
   override fun deleteBar(@PathVariable("barId") id: Long) {
-    findByOwner(currentUser().id!!, id)
+    findByOwner(currentUser().id, id)
     barService.deleteBar(id)
   }
 
-  private class BarWithOwner(private val bar: Bar, override val owner: User) : Bar {
-    override val id: Long?
-      get() = bar.id
+  private class BarWithOwner(private val bar: BarSpec, override val owner: User) : BarSpec {
     override val title: String?
       get() = bar.title
     override val description: String?
       get() = bar.description
-    override val ingredients: Set<Ingredient>?
-      get() = bar.ingredients
   }
 }

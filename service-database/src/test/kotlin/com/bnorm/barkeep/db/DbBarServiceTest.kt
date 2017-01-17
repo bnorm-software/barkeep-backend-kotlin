@@ -17,7 +17,7 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   fun cleanup() {
     val bars = service.getBars()
     for (bar in bars) {
-      service.deleteBar(bar.id!!)
+      service.deleteBar(bar.id)
     }
   }
 
@@ -38,27 +38,6 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     response.id should beValid
     response.title shouldBe "Bar1"
     response.description shouldBe "Description1"
-  }
-
-  @Test
-  @Throws(Exception::class)
-  fun createBar_failure_badId() {
-    // given
-    val bar = BarValue.builder()
-            .setId(1L)
-            .setTitle("Bar1")
-            .setDescription("Description1")
-            .setOwner(joeTestmore)
-            .build()
-
-    try {
-      // when
-      service.createBar(bar)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "already has an id"
-    }
   }
 
 

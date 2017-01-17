@@ -7,11 +7,16 @@ import com.bnorm.barkeep.db.DbIngredientService
 import com.bnorm.barkeep.db.DbRecipeService
 import com.bnorm.barkeep.db.DbUserService
 import com.bnorm.barkeep.model.Bar
+import com.bnorm.barkeep.model.BarSpec
 import com.bnorm.barkeep.model.Book
+import com.bnorm.barkeep.model.BookSpec
 import com.bnorm.barkeep.model.Component
 import com.bnorm.barkeep.model.Ingredient
+import com.bnorm.barkeep.model.IngredientSpec
 import com.bnorm.barkeep.model.Recipe
+import com.bnorm.barkeep.model.RecipeSpec
 import com.bnorm.barkeep.model.User
+import com.bnorm.barkeep.model.UserSpec
 import com.bnorm.barkeep.model.bean.BarBean
 import com.bnorm.barkeep.model.bean.BookBean
 import com.bnorm.barkeep.model.bean.ComponentBean
@@ -40,11 +45,16 @@ open class RestApplication {
     val builder = Jackson2ObjectMapperBuilder()
     builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     builder.deserializerByType(Bar::class.java, DelegateJsonDeserializer(BarBean::class.java))
+    builder.deserializerByType(BarSpec::class.java, DelegateJsonDeserializer(BarBean::class.java))
     builder.deserializerByType(Book::class.java, DelegateJsonDeserializer(BookBean::class.java))
+    builder.deserializerByType(BookSpec::class.java, DelegateJsonDeserializer(BookBean::class.java))
     builder.deserializerByType(Component::class.java, DelegateJsonDeserializer(ComponentBean::class.java))
     builder.deserializerByType(Ingredient::class.java, DelegateJsonDeserializer(IngredientBean::class.java))
+    builder.deserializerByType(IngredientSpec::class.java, DelegateJsonDeserializer(IngredientBean::class.java))
     builder.deserializerByType(Recipe::class.java, DelegateJsonDeserializer(RecipeBean::class.java))
+    builder.deserializerByType(RecipeSpec::class.java, DelegateJsonDeserializer(RecipeBean::class.java))
     builder.deserializerByType(User::class.java, DelegateJsonDeserializer(UserBean::class.java))
+    builder.deserializerByType(UserSpec::class.java, DelegateJsonDeserializer(UserBean::class.java))
     builder.indentOutput(true)
     return builder
   }

@@ -2,6 +2,7 @@
 package com.bnorm.barkeep.service
 
 import com.bnorm.barkeep.model.Book
+import com.bnorm.barkeep.model.BookSpec
 
 interface BookService {
 
@@ -9,9 +10,9 @@ interface BookService {
 
   fun getBook(id: Long): Book?
 
-  fun createBook(book: Book): Book
+  fun createBook(book: BookSpec): Book
 
-  fun setBook(id: Long, book: Book): Book
+  fun setBook(id: Long, book: BookSpec): Book
 
   fun deleteBook(id: Long)
 }

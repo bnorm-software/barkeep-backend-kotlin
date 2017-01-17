@@ -4,16 +4,21 @@ package com.bnorm.barkeep.rest
 import com.bnorm.barkeep.RestApplication
 import com.bnorm.barkeep.db.DbUserService
 import com.bnorm.barkeep.model.Bar
+import com.bnorm.barkeep.model.BarSpec
 import com.bnorm.barkeep.model.BarValue
 import com.bnorm.barkeep.model.Book
+import com.bnorm.barkeep.model.BookSpec
 import com.bnorm.barkeep.model.BookValue
 import com.bnorm.barkeep.model.Component
 import com.bnorm.barkeep.model.ComponentValue
 import com.bnorm.barkeep.model.Ingredient
+import com.bnorm.barkeep.model.IngredientSpec
 import com.bnorm.barkeep.model.IngredientValue
 import com.bnorm.barkeep.model.Recipe
+import com.bnorm.barkeep.model.RecipeSpec
 import com.bnorm.barkeep.model.RecipeValue
 import com.bnorm.barkeep.model.User
+import com.bnorm.barkeep.model.UserSpec
 import com.bnorm.barkeep.model.UserValue
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -26,7 +31,7 @@ import okhttp3.OkHttpClient
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.ClassRule
-import org.junit.Rule
+import org.junit.runner.RunWith
 import org.springframework.boot.context.embedded.LocalServerPort
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.util.EnvironmentTestUtils
@@ -35,8 +40,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.junit4.rules.SpringClassRule
-import org.springframework.test.context.junit4.rules.SpringMethodRule
+import org.springframework.test.context.junit4.SpringRunner
 import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.GenericContainer
 import retrofit2.Retrofit
@@ -44,6 +48,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.Properties
 import javax.persistence.Persistence
 
+@RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = arrayOf(RestApplication::class),
                       initializers = arrayOf(AbstractRestServiceTest.Initializer::class))
@@ -56,10 +61,6 @@ abstract class AbstractRestServiceTest : Matchers {
           throw AssertionError("$value is not a valid ID")
       }
     }
-
-    @get:ClassRule
-    @JvmStatic
-    val SPRING_CLASS_RULE = SpringClassRule()
 
     private val MYSQL_PORT = 3306
 
@@ -108,12 +109,8 @@ abstract class AbstractRestServiceTest : Matchers {
     }
   }
 
-  @Rule
-  val springMethodRule = SpringMethodRule()
-
   @LocalServerPort
   private val port: Int = 0
-
 
   class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
     override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
@@ -152,21 +149,21 @@ abstract class AbstractRestServiceTest : Matchers {
               .build()
     }
     val client = OkHttpClient.Builder().addInterceptor(CookieInterceptor(url))
-            .addInterceptor(WireTraceInterceptor())
+            // .addInterceptor(WireTraceInterceptor())
             .authenticator(authenticator)
             .build()
     val moshi = Moshi.Builder().add(JsonAdapter.Factory { type, annotations, m ->
-      if (type == Recipe::class.java) {
+      if (type == Recipe::class.java || type == RecipeSpec::class.java) {
         return@Factory RecipeValue.jsonAdapter(m)
-      } else if (type == Bar::class.java) {
+      } else if (type == Bar::class.java || type == BarSpec::class.java) {
         return@Factory BarValue.jsonAdapter(m)
-      } else if (type == Book::class.java) {
+      } else if (type == Book::class.java || type == BookSpec::class.java) {
         return@Factory BookValue.jsonAdapter(m)
-      } else if (type == Ingredient::class.java) {
+      } else if (type == Ingredient::class.java || type == IngredientSpec::class.java) {
         return@Factory IngredientValue.jsonAdapter(m)
       } else if (type == Component::class.java) {
         return@Factory ComponentValue.jsonAdapter(m)
-      } else if (type == User::class.java) {
+      } else if (type == User::class.java || type == UserSpec::class.java) {
         return@Factory UserValue.jsonAdapter(m)
       } else {
         return@Factory null

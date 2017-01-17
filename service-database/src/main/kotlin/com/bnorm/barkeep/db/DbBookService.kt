@@ -2,6 +2,7 @@
 package com.bnorm.barkeep.db
 
 import com.bnorm.barkeep.model.Book
+import com.bnorm.barkeep.model.BookSpec
 import com.bnorm.barkeep.service.BookService
 import javax.persistence.EntityManager
 
@@ -15,23 +16,17 @@ class DbBookService(entityManager: EntityManager) : AbstractDbService(entityMana
     return super.getBook(id)
   }
 
-  override fun createBook(book: Book): BookEntity {
-    if (book.id != null) {
-      throw IllegalArgumentException("Cannot create book that already has an id=$book.id")
-    } else if (book.owner == null) {
+  override fun createBook(book: BookSpec): BookEntity {
+    if (book.owner == null) {
       throw IllegalArgumentException("Cannot create book without an owner")
     }
-    val userEntity = find(book.owner!!) ?: throw IllegalArgumentException("Cannot create book with an unknown owner id=$book.owner!!.id")
+    val userEntity = find(book.owner!!)
+            ?: throw IllegalArgumentException("Cannot create book with an unknown owner id=${book.owner!!.id}")
 
     val bookEntity = BookEntity()
     bookEntity.title = book.title
     bookEntity.description = book.description
     bookEntity.owner = userEntity
-    if (book.recipes != null) {
-      for (recipe in book.recipes!!) {
-        bookEntity.addRecipe(find(recipe)!!)
-      }
-    }
 
     txn {
       em.persist(bookEntity)
@@ -40,9 +35,8 @@ class DbBookService(entityManager: EntityManager) : AbstractDbService(entityMana
     return bookEntity
   }
 
-  override fun setBook(id: Long, book: Book): BookEntity {
+  override fun setBook(id: Long, book: BookSpec): BookEntity {
     val bookEntity = requireExists(findBook(id), id, "book")
-    requireMatch(book, id, "book")
 
     txn {
       if (book.title != null) {
@@ -53,12 +47,6 @@ class DbBookService(entityManager: EntityManager) : AbstractDbService(entityMana
       }
       if (book.owner != null) {
         bookEntity.owner = find(book.owner!!)
-      }
-      if (book.recipes != null) {
-        // todo is this correct?
-        for (recipe in book.recipes!!) {
-          bookEntity.addRecipe(find(recipe)!!)
-        }
       }
     }
 

@@ -16,7 +16,7 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val books = service.getBooks().execute().body()
     if (books != null) {
       for (book in books) {
-        service.deleteBook(book.id!!).execute()
+        service.deleteBook(book.id).execute()
       }
     }
   }
@@ -37,27 +37,9 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     // then
     assertThat(response.isSuccessful()).isTrue()
     assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id!! should beValid
+    response.body().id should beValid
     response.body().title shouldBe book.title
     response.body().description shouldBe book.description
-  }
-
-  @Test
-  @Throws(Exception::class)
-  fun createBook_failure_badId() {
-    // given
-    val book = BookValue.builder()
-            .setId(1L)
-            .setTitle("Book1")
-            .setDescription("Description1")
-            .build()
-
-    // when
-    val response = service.createBook(book).execute()
-
-    // then
-    assertThat(response.isSuccessful()).isFalse()
-    assertThat(response.raw().code()).isEqualTo(BAD_REQUEST)
   }
 
 
@@ -77,7 +59,7 @@ class RestBookServiceTest : AbstractRestServiceTest() {
             .body()
 
     // when
-    val response = service.getBook(book.id!!).execute()
+    val response = service.getBook(book.id).execute()
 
     // then
     assertThat(response.isSuccessful()).isTrue()
@@ -114,7 +96,7 @@ class RestBookServiceTest : AbstractRestServiceTest() {
             .body()
 
     // when
-    val response = service.updateBook(book.id!!,
+    val response = service.updateBook(book.id,
                                       BookValue.builder()
                                               .setTitle("Book2")
                                               .build()).execute()
@@ -136,7 +118,7 @@ class RestBookServiceTest : AbstractRestServiceTest() {
             .body()
 
     // when
-    val response = service.updateBook(book.id!!,
+    val response = service.updateBook(book.id,
                                       BookValue.builder()
                                               .setTitle("Book2")
                                               .setDescription("Description2")
@@ -181,7 +163,7 @@ class RestBookServiceTest : AbstractRestServiceTest() {
             .body()
 
     // when
-    val response = service.deleteBook(book1.id!!).execute()
+    val response = service.deleteBook(book1.id).execute()
 
     // then
     assertThat(response.isSuccessful()).isTrue()
@@ -227,7 +209,7 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val book1 = service.createBook(BookValue.builder().setTitle("Book1").setDescription("Description1").build())
             .execute()
             .body()
-    service.deleteBook(book1.id!!).execute()
+    service.deleteBook(book1.id).execute()
 
     // when
     val response = service.getBooks().execute()
@@ -269,8 +251,8 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val book3 = service.createBook(BookValue.builder().setTitle("Book3").setDescription("Description3").build())
             .execute()
             .body()
-    service.deleteBook(book1.id!!).execute()
-    service.deleteBook(book3.id!!).execute()
+    service.deleteBook(book1.id).execute()
+    service.deleteBook(book3.id).execute()
 
     // when
     val response = service.getBooks().execute()
@@ -325,8 +307,8 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val book1 = service.createBook(BookValue.builder().setTitle("Book1").setDescription("Description1").build())
             .execute()
             .body()
-    service.deleteBook(book4.id!!).execute()
-    service.deleteBook(book2.id!!).execute()
+    service.deleteBook(book4.id).execute()
+    service.deleteBook(book2.id).execute()
 
     // when
     val response = service.getBooks().execute()

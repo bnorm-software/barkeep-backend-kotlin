@@ -20,7 +20,7 @@ interface BarSpec {
 interface Bar : BarSpec, HasId, Comparable<Bar> {
 
   @get:JsonView(Bar::class)
-  val ingredients: Set<Ingredient>?
+  val ingredients: Set<Ingredient>
 
   override fun compareTo(other: Bar): Int {
     return HasId.COMPARATOR.compare(this, other)

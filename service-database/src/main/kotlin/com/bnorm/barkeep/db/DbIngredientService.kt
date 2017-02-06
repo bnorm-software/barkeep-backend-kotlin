@@ -6,56 +6,44 @@ import com.bnorm.barkeep.model.IngredientSpec
 import com.bnorm.barkeep.service.IngredientService
 import javax.persistence.EntityManager
 
-class DbIngredientService(entityManager: EntityManager) : AbstractDbService(entityManager), IngredientService {
-
-  private fun parentEntity(ingredient: IngredientSpec): IngredientEntity? {
-    return ingredient.parent?.id?.let { findIngredient(it) }
-  }
+class DbIngredientService(private val em: EntityManager) : IngredientService {
 
   override fun getIngredients(): List<Ingredient> {
-    return super.getIngredients()
+    return em.createNamedQuery("IngredientEntity.findAll", IngredientEntity::class.java).resultList
   }
 
-  override fun getIngredient(id: Long): IngredientEntity? {
-    return super.getIngredient(id)
+  fun findIngredient(id: Long): IngredientEntity? {
+    return em.find(IngredientEntity::class.java, id)
+  }
+
+  override fun getIngredient(id: Long): IngredientEntity {
+    return findIngredient(id) ?: throw IllegalArgumentException("Cannot find ingredient with id=$id")
   }
 
   override fun createIngredient(ingredient: IngredientSpec): IngredientEntity {
-    val parentEntity = parentEntity(ingredient)
-    // todo check parentEntity exists if needed
-
     val ingredientEntity = IngredientEntity()
+    ingredient.title?.apply { ingredientEntity.title = this }
+    ingredient.parent?.apply { ingredientEntity.parent = getIngredient(this.id) }
 
-    ingredientEntity.title = ingredient.title
-    ingredientEntity.parent = parentEntity
-
-    txn {
+    em.txn {
       em.persist(ingredientEntity)
     }
-
     return ingredientEntity
   }
 
   override fun setIngredient(id: Long, ingredient: IngredientSpec): IngredientEntity {
-    val ingredientEntity = requireExists(findIngredient(id), id, "ingredient")
+    val ingredientEntity = getIngredient(id)
 
-    txn {
-      if (ingredient.title != null) {
-        ingredientEntity.title = ingredient.title
-      }
-      if (ingredient.parent != null) {
-        ingredientEntity.parent = parentEntity(ingredient)
-      }
+    em.txn {
+      ingredient.title?.apply { ingredientEntity.title = this }
+      ingredient.parent?.apply { ingredientEntity.parent = getIngredient(this.id) }
     }
-
     return ingredientEntity
   }
 
   override fun deleteIngredient(id: Long) {
-    txn {
-      val ingredientEntity = findIngredient(id)
-      requireExists(ingredientEntity, id, "ingredient")
-      em.remove(ingredientEntity)
+    em.txn {
+      em.remove(getIngredient(id))
     }
   }
 }

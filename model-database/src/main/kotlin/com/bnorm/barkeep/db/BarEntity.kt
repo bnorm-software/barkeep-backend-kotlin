@@ -69,4 +69,8 @@ class BarEntity : Bar {
   fun addIngredient(ingredient: IngredientEntity) {
     ingredients.add(ingredient)
   }
+
+  fun removeIngredient(ingredient: IngredientEntity) {
+    ingredients.remove(ingredient)
+  }
 }

@@ -8,7 +8,7 @@ interface IngredientService {
 
   fun getIngredients(): Collection<Ingredient>
 
-  fun getIngredient(id: Long): Ingredient?
+  fun getIngredient(id: Long): Ingredient
 
   fun createIngredient(ingredient: IngredientSpec): Ingredient
 

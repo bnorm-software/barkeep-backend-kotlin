@@ -10,7 +10,7 @@ import java.util.function.Function
 interface Component : Comparable<Component> {
 
   @get:JsonView(Any::class)
-  val ingredient: Ingredient?
+  val ingredient: Ingredient
 
   @get:JsonView(Any::class)
   val min: Double

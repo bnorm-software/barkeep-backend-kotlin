@@ -8,7 +8,7 @@ import com.bnorm.barkeep.model.BookValueAdapter
 import com.bnorm.barkeep.model.ComponentValueAdapter
 import com.bnorm.barkeep.model.IngredientValueAdapter
 import com.bnorm.barkeep.model.RecipeValueAdapter
-import com.bnorm.barkeep.model.UserValue
+import com.bnorm.barkeep.model.UserSpecValue
 import com.bnorm.barkeep.model.UserValueAdapter
 import com.squareup.moshi.Moshi
 import io.kotlintest.matchers.Matcher
@@ -67,7 +67,7 @@ abstract class AbstractRestServiceTest : Matchers {
     internal val CODE_UNAUTHORIZED = 401
     internal val CODE_NOT_FOUND = 404
 
-    internal val TEST_USER = UserValue(username = "joe", password = "testmore", email = "joe@test.more")
+    internal val TEST_USER = UserSpecValue(username = "joe", password = "testmore", email = "joe@test.more")
 
     @BeforeClass
     @JvmStatic
@@ -130,7 +130,7 @@ abstract class AbstractRestServiceTest : Matchers {
               .build()
     }
     val client = OkHttpClient.Builder().addInterceptor(CookieInterceptor(url))
-            // .addInterceptor(WireTraceInterceptor())
+             .addInterceptor(WireTraceInterceptor())
             .authenticator(authenticator)
             .build()
     val moshi = Moshi.Builder()

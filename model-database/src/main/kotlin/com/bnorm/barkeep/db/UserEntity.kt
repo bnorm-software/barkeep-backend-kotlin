@@ -69,7 +69,14 @@ class UserEntity : User {
   @SortNatural
   override val bars: MutableSet<BarEntity> = TreeSet()
 
-  @OneToMany(mappedBy = "owner")
+  @OneToMany(mappedBy = "owner", orphanRemoval = true)
+  @SortNatural
+  private val ownedRecipes: MutableSet<RecipeEntity> = TreeSet()
+
+  @OneToMany
+  @JoinTable(name = "lkpUsersRecipes",
+             joinColumns = arrayOf(JoinColumn(name = "user")),
+             inverseJoinColumns = arrayOf(JoinColumn(name = "recipe")))
   @SortNatural
   override val recipes: MutableSet<RecipeEntity> = TreeSet()
 
@@ -86,9 +93,9 @@ class UserEntity : User {
     books.add(bookEntity)
   }
 
-  fun removeBook(barEntity: BookEntity) {
-    books.remove(barEntity)
-    ownedBooks.remove(barEntity)
+  fun removeBook(bookEntity: BookEntity) {
+    books.remove(bookEntity)
+    ownedBooks.remove(bookEntity)
   }
 
   fun addRecipe(recipeEntity: RecipeEntity) {
@@ -97,5 +104,6 @@ class UserEntity : User {
 
   fun removeRecipe(recipeEntity: RecipeEntity) {
     recipes.remove(recipeEntity)
+    ownedRecipes.remove(recipeEntity)
   }
 }

@@ -13,7 +13,7 @@ class UserBean : User {
   override var password: String? = null
   override var displayName: String? = null
   override var email: String? = null
-  override var bars: Set<Bar>? = null
-  override var books: Set<Book>? = null
-  override var recipes: Set<Recipe>? = null
+  override var bars: Set<Bar> = emptySet()
+  override var books: Set<Book> = emptySet()
+  override var recipes: Set<Recipe> = emptySet()
 }

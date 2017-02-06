@@ -2,59 +2,61 @@
 package com.bnorm.barkeep.rest
 
 import com.bnorm.barkeep.db.DbRecipeService
-import com.bnorm.barkeep.db.DbUserService
 import com.bnorm.barkeep.model.Component
 import com.bnorm.barkeep.model.Recipe
 import com.bnorm.barkeep.model.RecipeSpec
 import com.bnorm.barkeep.model.User
 import com.bnorm.barkeep.service.RecipeService
 import com.fasterxml.jackson.annotation.JsonView
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/recipes")
-class RestRecipeService(private val userService: DbUserService,
-                        private val recipeService: DbRecipeService) : AbstractRestService(), RecipeService {
+class RestRecipeService(private val recipeService: DbRecipeService,
+                        private val userService: RestUserService) : RecipeService {
 
-  private fun findByOwner(userId: Long, recipeId: Long): Recipe {
-    val recipe = recipeService.getRecipe(recipeId)
-    if (!isOwnedBy(recipe, userId)) {
-      throw NotFound("Unable to find recipe with id=$recipeId")
+  fun isOwnedBy(recipe: RecipeSpec, userId: Long): Boolean = recipe.owner?.id == userId
+
+  private fun assertAccess(recipe: Recipe) {
+    val user = userService.getUser()
+    val recipes = user.recipes
+    if (!recipes.contains(recipe)) {
+      throw NotFound(MSG_NOT_FOUND(TYPE_RECIPE, recipe.id))
     }
-    return recipe!!
   }
 
-  private fun findByUser(user: User?, recipeId: Long): Recipe {
-    val recipe = recipeService.getRecipe(recipeId)
-    val recipes = user?.recipes
-    if (recipe == null || recipes != null && !recipes.contains(recipe)) {
-      throw NotFound("Unable to find recipe with id=$recipeId")
+  private fun assertOwnership(recipe: Recipe) {
+    if (!isOwnedBy(recipe, userService.currentId())) {
+      throw Forbidden(MSG_DO_NOT_OWN(TYPE_RECIPE, recipe.id))
     }
+  }
+
+  @JsonView(Recipe::class)
+  @GetMapping
+  override fun getRecipes(): Collection<Recipe> {
+    val user = userService.getUser()
+    return user.recipes
+  }
+
+  @JsonView(Recipe::class)
+  @GetMapping("/{recipeId}")
+  override fun getRecipe(@PathVariable("recipeId") id: Long): Recipe {
+    val recipe = recipeService.findRecipe(id) ?: throw NotFound(MSG_NOT_FOUND(TYPE_RECIPE, id))
+    assertAccess(recipe)
     return recipe
   }
 
   @JsonView(Recipe::class)
-  @RequestMapping(method = arrayOf(RequestMethod.GET))
-  override fun getRecipes(): Collection<Recipe> {
-    val user = userService.getUser(currentUser().id)
-    return user!!.recipes
-  }
-
-  @JsonView(Recipe::class)
-  @RequestMapping(value = "/{recipeId}", method = arrayOf(RequestMethod.GET))
-  override fun getRecipe(@PathVariable("recipeId") id: Long): Recipe? {
-    val user = userService.getUser(currentUser().id)
-    return findByUser(user, id)
-  }
-
-  @JsonView(Recipe::class)
-  @RequestMapping(method = arrayOf(RequestMethod.POST))
+  @PostMapping("/{recipeId}")
   override fun createRecipe(@RequestBody recipe: RecipeSpec): Recipe {
-    val currentUser = currentUser()
+    val currentUser = userService.getUser()
     if (recipe.owner == null) {
       return recipeService.createRecipe(RecipeWithOwner(recipe, currentUser))
     } else if (!isOwnedBy(recipe, currentUser.id)) {
@@ -65,15 +67,15 @@ class RestRecipeService(private val userService: DbUserService,
   }
 
   @JsonView(Recipe::class)
-  @RequestMapping(value = "/{recipeId}", method = arrayOf(RequestMethod.PUT))
+  @PutMapping("/{recipeId}")
   override fun setRecipe(@PathVariable("recipeId") id: Long, @RequestBody recipe: RecipeSpec): Recipe {
-    findByOwner(currentUser().id, id)
+    assertOwnership(getRecipe(id))
     return recipeService.setRecipe(id, recipe)
   }
 
-  @RequestMapping(value = "/{recipeId}", method = arrayOf(RequestMethod.DELETE))
+  @DeleteMapping("/{recipeId}")
   override fun deleteRecipe(@PathVariable("recipeId") id: Long) {
-    findByOwner(currentUser().id, id)
+    assertOwnership(getRecipe(id))
     recipeService.deleteRecipe(id)
   }
 

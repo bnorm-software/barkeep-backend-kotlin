@@ -6,7 +6,7 @@ import com.bnorm.barkeep.model.Ingredient
 
 class ComponentBean : Component {
 
-  override var ingredient: Ingredient? = null
+  override var ingredient: Ingredient = IngredientBean()
   override var min: Double = 0.0
   override var max: Double? = null
   override var componentNum: Long = 0

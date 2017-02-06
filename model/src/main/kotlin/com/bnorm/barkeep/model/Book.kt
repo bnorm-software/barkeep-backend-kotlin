@@ -20,7 +20,7 @@ interface BookSpec {
 interface Book : BookSpec, HasId, Comparable<Book> {
 
   @get:JsonView(Book::class)
-  val recipes: Set<Recipe>?
+  val recipes: Set<Recipe>
 
   override fun compareTo(other: Book): Int {
     return HasId.COMPARATOR.compare(this, other)

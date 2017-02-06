@@ -6,21 +6,25 @@ import com.bnorm.barkeep.model.RecipeSpec
 import com.bnorm.barkeep.service.RecipeService
 import javax.persistence.EntityManager
 
-class DbRecipeService(entityManager: EntityManager) : AbstractDbService(entityManager), RecipeService {
+class DbRecipeService(private val em: EntityManager,
+                      private val ingredientService: DbIngredientService,
+                      private val userService: DbUserService) : RecipeService {
 
   override fun getRecipes(): List<Recipe> {
-    return super.getRecipes()
+    return em.createNamedQuery("RecipeEntity.findAll", RecipeEntity::class.java).resultList
   }
 
-  override fun getRecipe(id: Long): RecipeEntity? {
-    return super.getRecipe(id)
+  fun findRecipe(id: Long): RecipeEntity? {
+    return em.find(RecipeEntity::class.java, id)
+  }
+
+  override fun getRecipe(id: Long): RecipeEntity {
+    return findRecipe(id) ?: throw IllegalArgumentException("Cannot find recipe with id=$id")
   }
 
   override fun createRecipe(recipe: RecipeSpec): RecipeEntity {
-    if (recipe.owner == null) {
-      throw IllegalArgumentException("Cannot create recipe without an owner")
-    }
-    val userEntity = find(recipe.owner!!) ?: throw IllegalArgumentException("Cannot create recipe with an unknown owner id=$recipe.owner!!.id")
+    val owner = recipe.owner ?: throw IllegalArgumentException("Cannot create recipe without an owner")
+    val userEntity = userService.findUser(owner.id) ?: throw IllegalArgumentException("Cannot create recipe with an unknown owner id=${owner.id}")
 
     val recipeEntity = RecipeEntity()
 
@@ -30,11 +34,13 @@ class DbRecipeService(entityManager: EntityManager) : AbstractDbService(entityMa
     recipeEntity.imageUrl = recipe.imageUrl
     recipeEntity.instructions = recipe.instructions
     recipeEntity.source = recipe.instructions
+    recipeEntity.addUser(userEntity)
 
-    if (recipe.components != null) {
-      for (component in recipe.components!!) {
+    val components = recipe.components
+    if (components != null) {
+      for (component in components) {
         val componentEntity = ComponentEntity()
-        componentEntity.ingredient = find(component.ingredient!!)
+        componentEntity.ingredient = ingredientService.getIngredient(component.ingredient.id)
         componentEntity.min = component.min
         componentEntity.max = component.max
         componentEntity.order = component.order
@@ -43,38 +49,28 @@ class DbRecipeService(entityManager: EntityManager) : AbstractDbService(entityMa
       }
     }
 
-    txn {
+    em.txn {
       em.persist(recipeEntity)
       userEntity.addRecipe(recipeEntity)
     }
-
     return recipeEntity
   }
 
   override fun setRecipe(id: Long, recipe: RecipeSpec): RecipeEntity {
-    val recipeEntity = requireExists(findRecipe(id), id, "recipe")
+    val recipeEntity = getRecipe(id)
 
-    txn {
-      if (recipe.title != null) {
-        recipeEntity.title = recipe.title
-      }
-      if (recipe.description != null) {
-        recipeEntity.description = recipe.title
-      }
-      if (recipe.imageUrl != null) {
-        recipeEntity.imageUrl = recipe.imageUrl
-      }
-      if (recipe.instructions != null) {
-        recipeEntity.instructions = recipe.instructions
-      }
-      if (recipe.source != null) {
-        recipeEntity.source = recipe.source
-      }
-      if (recipe.components != null) {
+    em.txn {
+      recipe.title?.apply { recipeEntity.title = this }
+      recipe.description?.apply { recipeEntity.description = this }
+      recipe.owner?.apply { recipeEntity.owner = userService.getUser(this.id) }
+      recipe.imageUrl?.apply { recipeEntity.imageUrl = this }
+      recipe.instructions?.apply { recipeEntity.instructions = this }
+      recipe.source?.apply { recipeEntity.source = this }
+      recipe.components?.apply {
         // todo is this right?
-        for (component in recipe.components!!) {
+        for (component in this) {
           val componentEntity = ComponentEntity()
-          componentEntity.ingredient = find(component.ingredient!!)
+          componentEntity.ingredient = ingredientService.getIngredient(component.ingredient.id)
           componentEntity.min = component.min
           componentEntity.max = component.max
           componentEntity.order = component.order
@@ -82,16 +78,13 @@ class DbRecipeService(entityManager: EntityManager) : AbstractDbService(entityMa
           recipeEntity.addComponent(componentEntity)
         }
       }
-
     }
     return recipeEntity
   }
 
   override fun deleteRecipe(id: Long) {
-    txn {
-      val recipeEntity = findRecipe(id)
-      requireExists(recipeEntity, id, "recipe")
-      em.remove(recipeEntity)
+    em.txn {
+      em.remove(getRecipe(id))
     }
   }
 }

@@ -12,7 +12,7 @@ data class BookValue(override val id: Long = -1,
                      override val title: String?,
                      override val description: String? = null,
                      override val owner: User? = null,
-                     override val recipes: Set<Recipe>? = emptySet()) : Book
+                     override val recipes: Set<Recipe> = emptySet()) : Book
 
 object BookValueAdapter {
   @ToJson fun toJson(book: BookSpec): BookSpecValue {

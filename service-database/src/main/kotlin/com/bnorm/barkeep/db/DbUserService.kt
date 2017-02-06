@@ -5,10 +5,14 @@ import com.bnorm.barkeep.model.UserSpec
 import com.bnorm.barkeep.service.UserService
 import javax.persistence.EntityManager
 
-class DbUserService(entityManager: EntityManager) : AbstractDbService(entityManager), UserService {
+class DbUserService(private val em: EntityManager) : UserService {
 
-  override fun getUser(id: Long): UserEntity? {
-    return super.getUser(id)
+  fun findUser(id: Long): UserEntity? {
+    return em.find(UserEntity::class.java, id)
+  }
+
+  override fun getUser(id: Long): UserEntity {
+    return findUser(id) ?: throw IllegalArgumentException("Cannot find user with id=%$id")
   }
 
   override fun createUser(user: UserSpec): UserEntity {
@@ -18,30 +22,20 @@ class DbUserService(entityManager: EntityManager) : AbstractDbService(entityMana
     userEntity.email = user.email
     userEntity.displayName = user.displayName
 
-    txn {
+    em.txn {
       em.persist(userEntity)
     }
     return userEntity
   }
 
-  override fun setUser(userId: Long, user: UserSpec): UserEntity {
-    val userEntity = requireExists(getUser(userId), userId, "user")
+  override fun setUser(id: Long, user: UserSpec): UserEntity {
+    val userEntity = getUser(id)
 
-    txn {
-      if (user.username != null) {
-        userEntity.username = user.username
-      }
-      if (user.password != null) {
-        userEntity.password = user.password
-      }
-      if (user.email != null) {
-        userEntity.email = user.email
-      }
-      if (user.displayName != null) {
-        userEntity.displayName = user.displayName
-      }
-
-      em.merge(userEntity)
+    em.txn {
+      user.username?.apply { userEntity.username = this }
+      user.password?.apply { userEntity.password = this }
+      user.email?.apply { userEntity.email = this }
+      user.displayName?.apply { userEntity.displayName = this }
     }
     return userEntity
   }

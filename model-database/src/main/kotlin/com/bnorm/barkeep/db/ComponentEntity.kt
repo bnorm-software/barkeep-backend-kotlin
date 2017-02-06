@@ -13,7 +13,7 @@ class ComponentEntity : Component {
 
   @ManyToOne
   @JoinColumn(name = "ingredient", referencedColumnName = "id", nullable = false)
-  override var ingredient: IngredientEntity? = null
+  override lateinit var ingredient: IngredientEntity
 
   @Column(name = "min", nullable = false)
   override var min: Double = 0.toDouble()

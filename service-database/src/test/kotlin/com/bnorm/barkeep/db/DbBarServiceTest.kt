@@ -1,9 +1,9 @@
 // Copyright 2016 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.db
 
-import com.bnorm.barkeep.model.BarValue
+import com.bnorm.barkeep.model.BarSpecValue
 import com.bnorm.barkeep.model.User
-import com.bnorm.barkeep.model.UserValue
+import com.bnorm.barkeep.model.UserSpecValue
 import io.kotlintest.matchers.have
 import org.junit.After
 import org.junit.BeforeClass
@@ -29,7 +29,7 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun createBar_successful() {
     // given
-    val bar = BarValue(title = "Bar1", description = "Description1", owner = joeTestmore)
+    val bar = BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore)
 
     // when
     val response = service.createBar(bar)
@@ -49,13 +49,12 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun getBar_successful() {
     // given
-    val bar = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+    val bar = service.createBar(BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
 
     // when
     val response = service.getBar(bar.id)
 
     // then
-    response!!
     response.id shouldBe bar.id
     response.title shouldBe bar.title
     response.description shouldBe bar.description
@@ -66,11 +65,14 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   fun getBar_failure_badId() {
     // given
 
-    // when
-    val response = service.getBar(-1)
-
-    // then
-    response shouldBe null
+    try {
+      // when
+      service.getBar(-1)
+      fail("Did not fail as expected")
+    } catch (e: IllegalArgumentException) {
+      // then
+      e.message!! should have substring "Cannot find bar"
+    }
   }
 
 
@@ -82,10 +84,10 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun setBar_successful_withValidBodyId() {
     // given
-    val bar = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+    val bar = service.createBar(BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
 
     // when
-    val response = service.setBar(bar.id, BarValue(title = "Bar2"))
+    val response = service.setBar(bar.id, BarSpecValue(title = "Bar2"))
 
     // then
     response.id shouldBe bar.id
@@ -97,10 +99,10 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun setBar_successful_withInvalidBodyId() {
     // given
-    val bar = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+    val bar = service.createBar(BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
 
     // when
-    val response = service.setBar(bar.id, BarValue(title = "Bar2", description = "Description2"))
+    val response = service.setBar(bar.id, BarSpecValue(title = "Bar2", description = "Description2"))
 
     // then
     response.id shouldBe bar.id
@@ -115,7 +117,7 @@ class DbBarServiceTest : AbstractDbServiceTest() {
 
     try {
       // when
-      service.setBar(-1, BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+      service.setBar(-1, BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
       fail("Did not fail as expected")
     } catch (e: IllegalArgumentException) {
       // then
@@ -132,7 +134,7 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun deleteBar_successful() {
     // given
-    val bar1 = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+    val bar1 = service.createBar(BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
 
     // when
     service.deleteBar(bar1.id)
@@ -176,7 +178,7 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun getBars_successful_emptyAfterDelete() {
     // given
-    val bar1 = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+    val bar1 = service.createBar(BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
     service.deleteBar(bar1.id)
 
     // when
@@ -190,7 +192,7 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun getBars_successful_single() {
     // given
-    val bar1 = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+    val bar1 = service.createBar(BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
 
     // when
     val response = service.getBars()
@@ -204,9 +206,9 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun getBars_successful_singleAfterDelete() {
     // given
-    val bar1 = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
-    val bar2 = service.createBar(BarValue(title = "Bar2", description = "Description2", owner = joeTestmore))
-    val bar3 = service.createBar(BarValue(title = "Bar3", description = "Description3", owner = joeTestmore))
+    val bar1 = service.createBar(BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+    val bar2 = service.createBar(BarSpecValue(title = "Bar2", description = "Description2", owner = joeTestmore))
+    val bar3 = service.createBar(BarSpecValue(title = "Bar3", description = "Description3", owner = joeTestmore))
     service.deleteBar(bar1.id)
     service.deleteBar(bar3.id)
 
@@ -222,9 +224,9 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun getBars_successful_multiple() {
     // given
-    val bar1 = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
-    val bar3 = service.createBar(BarValue(title = "Bar3", description = "Description3", owner = joeTestmore))
-    val bar2 = service.createBar(BarValue(title = "Bar2", description = "Description2", owner = joeTestmore))
+    val bar1 = service.createBar(BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+    val bar3 = service.createBar(BarSpecValue(title = "Bar3", description = "Description3", owner = joeTestmore))
+    val bar2 = service.createBar(BarSpecValue(title = "Bar2", description = "Description2", owner = joeTestmore))
 
     // when
     val response = service.getBars()
@@ -238,11 +240,11 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   @Throws(Exception::class)
   fun getBars_successful_multipleAfterDelete() {
     // given
-    val bar5 = service.createBar(BarValue(title = "Bar5", description = "Description5", owner = joeTestmore))
-    val bar2 = service.createBar(BarValue(title = "Bar2", description = "Description2", owner = joeTestmore))
-    val bar3 = service.createBar(BarValue(title = "Bar3", description = "Description3", owner = joeTestmore))
-    val bar4 = service.createBar(BarValue(title = "Bar4", description = "Description4", owner = joeTestmore))
-    val bar1 = service.createBar(BarValue(title = "Bar1", description = "Description1", owner = joeTestmore))
+    val bar5 = service.createBar(BarSpecValue(title = "Bar5", description = "Description5", owner = joeTestmore))
+    val bar2 = service.createBar(BarSpecValue(title = "Bar2", description = "Description2", owner = joeTestmore))
+    val bar3 = service.createBar(BarSpecValue(title = "Bar3", description = "Description3", owner = joeTestmore))
+    val bar4 = service.createBar(BarSpecValue(title = "Bar4", description = "Description4", owner = joeTestmore))
+    val bar1 = service.createBar(BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
     service.deleteBar(bar4.id)
     service.deleteBar(bar2.id)
 
@@ -262,10 +264,12 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     @BeforeClass
     @JvmStatic
     fun setupBarService() {
-      service = DbBarService(em)
-
       val userService = DbUserService(em)
-      joeTestmore = userService.createUser(UserValue(username = "joe", password = "testmore", email = "joe@test.more"))
+      service = DbBarService(em, DbIngredientService(em), userService)
+
+      joeTestmore = userService.createUser(UserSpecValue(username = "joe",
+                                                         password = "testmore",
+                                                         email = "joe@test.more"))
     }
   }
 }

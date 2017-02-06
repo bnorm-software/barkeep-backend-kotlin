@@ -1,6 +1,7 @@
 // Copyright 2017 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.model
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonView
 
@@ -10,6 +11,7 @@ interface IngredientSpec {
   val title: String?
 
   @get:JsonView(Ingredient::class)
+  @get:JsonIgnoreProperties("parent")
   val parent: Ingredient?
 }
 

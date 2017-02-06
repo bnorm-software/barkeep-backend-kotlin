@@ -8,7 +8,7 @@ interface RecipeService {
 
   fun getRecipes(): Collection<Recipe>
 
-  fun getRecipe(id: Long): Recipe?
+  fun getRecipe(id: Long): Recipe
 
   fun createRecipe(recipe: RecipeSpec): Recipe
 

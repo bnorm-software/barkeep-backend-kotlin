@@ -11,5 +11,5 @@ class BarBean : Bar {
   override var title: String? = null
   override var description: String? = null
   override var owner: User? = null
-  override var ingredients: Set<Ingredient>? = null
+  override var ingredients: Set<Ingredient> = emptySet()
 }

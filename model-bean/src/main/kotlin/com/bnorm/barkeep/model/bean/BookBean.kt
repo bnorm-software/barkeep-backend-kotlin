@@ -11,5 +11,5 @@ class BookBean : Book {
   override var title: String? = null
   override var description: String? = null
   override var owner: User? = null
-  override var recipes: Set<Recipe>? = null
+  override var recipes: Set<Recipe> = emptySet()
 }

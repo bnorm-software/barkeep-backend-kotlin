@@ -14,9 +14,9 @@ data class UserValue(override val id: Long = -1,
                      override val password: String? = null,
                      override val displayName: String? = null,
                      override val email: String? = null,
-                     override val bars: Set<Bar>? = emptySet(),
-                     override val books: Set<Book>? = emptySet(),
-                     override val recipes: Set<Recipe>? = emptySet()) : User
+                     override val bars: Set<Bar> = emptySet(),
+                     override val books: Set<Book> = emptySet(),
+                     override val recipes: Set<Recipe> = emptySet()) : User
 
 object UserValueAdapter {
   @ToJson fun toJson(user: UserSpec): UserSpecValue {

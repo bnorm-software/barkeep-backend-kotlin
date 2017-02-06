@@ -12,7 +12,6 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.JoinColumn
-import javax.persistence.JoinTable
 import javax.persistence.ManyToMany
 import javax.persistence.ManyToOne
 import javax.persistence.NamedQueries
@@ -60,25 +59,33 @@ class RecipeEntity : Recipe {
   @SortNatural
   override val components: MutableSet<ComponentEntity> = TreeSet()
 
-  @ManyToMany(mappedBy = "bars")
+  @ManyToMany(mappedBy = "recipes")
   @SortNatural
-  private val users: Set<UserEntity> = TreeSet()
+  private val users: MutableSet<UserEntity> = TreeSet()
 
-  @ManyToMany
-  @JoinTable(name = "lkpBooksRecipes",
-             joinColumns = arrayOf(JoinColumn(name = "recipe")),
-             inverseJoinColumns = arrayOf(JoinColumn(name = "book")))
+  @ManyToMany(mappedBy = "recipes")
   @SortNatural
-  private val books: Set<BookEntity> = TreeSet()
+  private val books: MutableSet<BookEntity> = TreeSet()
 
   @PreRemove
   fun onRemove() {
     for (userEntity in users) {
       userEntity.removeRecipe(this)
     }
+    for (book in books) {
+      book.removeRecipe(this)
+    }
+  }
+
+  fun addUser(userEntity: UserEntity) {
+    users.add(userEntity)
   }
 
   fun addComponent(componentEntity: ComponentEntity) {
     components.add(componentEntity)
+  }
+
+  fun removeBook(bookEntity: BookEntity) {
+    books.remove(bookEntity)
   }
 }

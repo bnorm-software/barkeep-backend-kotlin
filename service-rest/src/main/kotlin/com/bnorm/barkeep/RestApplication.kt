@@ -32,7 +32,6 @@ import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
-import java.io.IOException
 import java.util.Properties
 import javax.persistence.EntityManager
 import javax.persistence.Persistence
@@ -77,8 +76,10 @@ open class RestApplication {
   }
 
   @Bean
-  open fun getDbBarService(entityManager: EntityManager): DbBarService {
-    return DbBarService(entityManager)
+  open fun getDbBarService(entityManager: EntityManager,
+                           ingredientService: DbIngredientService,
+                           userService: DbUserService): DbBarService {
+    return DbBarService(entityManager, ingredientService, userService)
   }
 
   @Bean
@@ -87,19 +88,21 @@ open class RestApplication {
   }
 
   @Bean
-  open fun getDbBookService(entityManager: EntityManager): DbBookService {
-    return DbBookService(entityManager)
+  open fun getDbBookService(entityManager: EntityManager,
+                            recipeService: DbRecipeService,
+                            userService: DbUserService): DbBookService {
+    return DbBookService(entityManager, recipeService, userService)
   }
 
   @Bean
-  open fun getDbRecipeService(entityManager: EntityManager): DbRecipeService {
-    return DbRecipeService(entityManager)
+  open fun getDbRecipeService(entityManager: EntityManager,
+                              ingredientService: DbIngredientService,
+                              userService: DbUserService): DbRecipeService {
+    return DbRecipeService(entityManager, ingredientService, userService)
   }
 }
 
 private class DelegateJsonDeserializer<T>(private val valueType: Class<T>) : JsonDeserializer<T>() {
-
-  @Throws(IOException::class)
   override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T {
     return p.readValueAs<T>(valueType)
   }

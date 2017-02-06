@@ -60,12 +60,26 @@ class BookEntity : Book {
 
   @PreRemove
   fun onRemove() {
-    for (userEntity in users) {
-      userEntity.removeBook(this)
+    for (user in users) {
+      user.removeBook(this)
     }
+    users.clear()
+
+    for (recipe in recipes) {
+      recipe.removeBook(this)
+    }
+    recipes.clear()
+  }
+
+  fun addUser(userEntity: UserEntity) {
+    users.add(userEntity)
   }
 
   fun addRecipe(recipe: RecipeEntity) {
     recipes.add(recipe)
+  }
+
+  fun removeRecipe(recipe: RecipeEntity) {
+    recipes.remove(recipe)
   }
 }

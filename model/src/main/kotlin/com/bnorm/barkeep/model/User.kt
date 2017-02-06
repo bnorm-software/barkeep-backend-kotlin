@@ -22,13 +22,13 @@ interface UserSpec {
 interface User : UserSpec, HasId, Comparable<User> {
 
   @get:JsonView(User::class)
-  val bars: Set<Bar>?
+  val bars: Set<Bar>
 
   @get:JsonView(User::class)
-  val books: Set<Book>?
+  val books: Set<Book>
 
   @get:JsonView(User::class)
-  val recipes: Set<Recipe>?
+  val recipes: Set<Recipe>
 
   override fun compareTo(other: User): Int {
     return HasId.COMPARATOR.compare(this, other)

@@ -6,22 +6,25 @@ import com.bnorm.barkeep.model.BarSpec
 import com.bnorm.barkeep.service.BarService
 import javax.persistence.EntityManager
 
-class DbBarService(entityManager: EntityManager) : AbstractDbService(entityManager), BarService {
+class DbBarService(private val em: EntityManager,
+                   private val ingredientService: DbIngredientService,
+                   private val userService: DbUserService) : BarService {
 
   override fun getBars(): List<Bar> {
-    return super.getBars()
+    return em.createNamedQuery("BarEntity.findAll", BarEntity::class.java).resultList
   }
 
-  override fun getBar(id: Long): BarEntity? {
-    return super.getBar(id)
+  fun findBar(id: Long): BarEntity? {
+    return em.find(BarEntity::class.java, id)
+  }
+
+  override fun getBar(id: Long): BarEntity {
+    return findBar(id) ?: throw IllegalArgumentException("Cannot find bar with id=$id")
   }
 
   override fun createBar(bar: BarSpec): BarEntity {
-    if (bar.owner == null) {
-      throw IllegalArgumentException("Cannot create bar without an owner")
-    }
-    val userEntity = find(bar.owner!!) ?: throw IllegalArgumentException(String.format("Cannot create bar with an unknown owner id=%d",
-                                                                                       bar.owner!!.id))
+    val owner = bar.owner ?: throw IllegalArgumentException("Cannot create bar without an owner")
+    val userEntity = userService.findUser(owner.id) ?: throw IllegalArgumentException("Cannot create bar with an unknown owner id=${owner.id}")
 
     val barEntity = BarEntity()
     barEntity.title = bar.title
@@ -29,36 +32,46 @@ class DbBarService(entityManager: EntityManager) : AbstractDbService(entityManag
     barEntity.owner = userEntity
     barEntity.addUser(userEntity)
 
-    txn {
+    em.txn {
       em.persist(barEntity)
       userEntity.addBar(barEntity)
     }
     return barEntity
   }
 
-  override fun setBar(id: Long, bar: BarSpec): BarEntity {
-    val barEntity = requireExists(findBar(id), id, "bar")
+  override fun addBarIngredient(barId: Long, ingredientId: Long) {
+    val barEntity = getBar(barId)
+    val ingredientEntity = ingredientService.getIngredient(ingredientId)
 
-    txn {
-      if (bar.title != null) {
-        barEntity.title = bar.title
-      }
-      if (bar.description != null) {
-        barEntity.description = bar.description
-      }
-      if (bar.owner != null) {
-        barEntity.owner = find(bar.owner!!)
-      }
+    em.txn {
+      barEntity.addIngredient(ingredientEntity)
     }
+  }
 
+  override fun removeBarIngredient(barId: Long, ingredientId: Long) {
+    val barEntity = getBar(barId)
+    val ingredientEntity = ingredientService.getIngredient(ingredientId)
+
+    em.txn {
+      barEntity.removeIngredient(ingredientEntity)
+    }
+  }
+
+  override fun setBar(id: Long, bar: BarSpec): BarEntity {
+    val barEntity = getBar(id)
+
+    em.txn {
+      // todo what if we want to clear a value?
+      bar.title?.apply { barEntity.title = this }
+      bar.description?.apply { barEntity.description = this }
+      bar.owner?.apply { barEntity.owner = userService.getUser(this.id) }
+    }
     return barEntity
   }
 
   override fun deleteBar(id: Long) {
-    txn {
-      val barEntity = findBar(id)
-      requireExists(barEntity, id, "bar")
-      em.remove(barEntity)
+    em.txn {
+      em.remove(getBar(id))
     }
   }
 }

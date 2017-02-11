@@ -14,5 +14,5 @@ class RecipeBean : Recipe {
   override var imageUrl: String? = null
   override var instructions: String? = null
   override var source: String? = null
-  override var components: Set<Component>? = null
+  override var components: Set<Component> = emptySet()
 }

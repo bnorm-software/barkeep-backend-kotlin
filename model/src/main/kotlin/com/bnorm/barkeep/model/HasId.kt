@@ -11,6 +11,6 @@ interface HasId {
 
   companion object {
 
-    val COMPARATOR: Comparator<HasId> = Comparator.comparing(Function<HasId, Long> { it?.id })
+    internal val COMPARATOR = Comparator.comparing(Function<HasId, Long> { it.id })
   }
 }

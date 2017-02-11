@@ -9,10 +9,3 @@ services:
     - MYSQL_ROOT_PASSWORD=root
     volumes:
     - ./model-database/src/main/resources/com/bnorm/barkeep/db/init:/docker-entrypoint-initdb.d
-
-#  service:
-#    image: barkeep/barkeep-service
-#    ports:
-#    - "8080:8080"
-#    environment:
-#    - barkeep.db.host=database

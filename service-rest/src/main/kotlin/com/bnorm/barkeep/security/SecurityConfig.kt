@@ -11,9 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @Configuration
 @EnableWebSecurity
-open class SecurityConfig
-@Autowired
-constructor(private val userDetailsService: BarkeepUserDetailsService) : WebSecurityConfigurerAdapter() {
+open class SecurityConfig(private val userDetailsService: BarkeepUserDetailsService) : WebSecurityConfigurerAdapter() {
 
   @Autowired
   @Throws(Exception::class)

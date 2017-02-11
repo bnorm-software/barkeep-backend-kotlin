@@ -1,11 +1,11 @@
 // Copyright 2017 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep
 
-import com.bnorm.barkeep.db.DbBarService
-import com.bnorm.barkeep.db.DbBookService
-import com.bnorm.barkeep.db.DbIngredientService
-import com.bnorm.barkeep.db.DbRecipeService
-import com.bnorm.barkeep.db.DbUserService
+import com.bnorm.barkeep.service.db.DbBarService
+import com.bnorm.barkeep.service.db.DbBookService
+import com.bnorm.barkeep.service.db.DbIngredientService
+import com.bnorm.barkeep.service.db.DbRecipeService
+import com.bnorm.barkeep.service.db.DbUserService
 import com.bnorm.barkeep.model.Bar
 import com.bnorm.barkeep.model.BarSpec
 import com.bnorm.barkeep.model.Book

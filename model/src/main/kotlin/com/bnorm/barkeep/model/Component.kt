@@ -30,7 +30,7 @@ interface Component : Comparable<Component> {
 
   companion object {
 
-    val COMPARATOR: Comparator<Component> =
+    private val COMPARATOR =
             Comparator.comparing(Function<Component, Long> { it?.order })
                     .thenComparing(Function<Component, Long> { it?.componentNum })
   }

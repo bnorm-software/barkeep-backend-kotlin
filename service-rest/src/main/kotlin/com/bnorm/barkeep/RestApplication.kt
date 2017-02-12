@@ -23,6 +23,7 @@ import com.bnorm.barkeep.model.bean.ComponentBean
 import com.bnorm.barkeep.model.bean.IngredientBean
 import com.bnorm.barkeep.model.bean.RecipeBean
 import com.bnorm.barkeep.model.bean.UserBean
+import com.bnorm.barkeep.service.db.Pool
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
@@ -71,34 +72,42 @@ open class RestApplication {
   }
 
   @Bean
-  open fun getDbUserService(entityManager: EntityManager): DbUserService {
-    return DbUserService(entityManager)
+  open fun getEntityManagerPool(entityManager: EntityManager): Pool<EntityManager> {
+    return object : Pool<EntityManager> {
+      override fun take(): EntityManager = entityManager
+      override fun give(type: EntityManager) {}
+    }
   }
 
   @Bean
-  open fun getDbBarService(entityManager: EntityManager,
+  open fun getDbUserService(entityManagerPool: Pool<EntityManager>): DbUserService {
+    return DbUserService(entityManagerPool)
+  }
+
+  @Bean
+  open fun getDbBarService(entityManagerPool: Pool<EntityManager>,
                            ingredientService: DbIngredientService,
                            userService: DbUserService): DbBarService {
-    return DbBarService(entityManager, ingredientService, userService)
+    return DbBarService(entityManagerPool, ingredientService, userService)
   }
 
   @Bean
-  open fun getDbIngredientService(entityManager: EntityManager): DbIngredientService {
-    return DbIngredientService(entityManager)
+  open fun getDbIngredientService(entityManagerPool: Pool<EntityManager>): DbIngredientService {
+    return DbIngredientService(entityManagerPool)
   }
 
   @Bean
-  open fun getDbBookService(entityManager: EntityManager,
+  open fun getDbBookService(entityManagerPool: Pool<EntityManager>,
                             recipeService: DbRecipeService,
                             userService: DbUserService): DbBookService {
-    return DbBookService(entityManager, recipeService, userService)
+    return DbBookService(entityManagerPool, recipeService, userService)
   }
 
   @Bean
-  open fun getDbRecipeService(entityManager: EntityManager,
+  open fun getDbRecipeService(entityManagerPool: Pool<EntityManager>,
                               ingredientService: DbIngredientService,
                               userService: DbUserService): DbRecipeService {
-    return DbRecipeService(entityManager, ingredientService, userService)
+    return DbRecipeService(entityManagerPool, ingredientService, userService)
   }
 }
 

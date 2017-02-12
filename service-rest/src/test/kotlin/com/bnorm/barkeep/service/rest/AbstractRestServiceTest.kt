@@ -10,6 +10,7 @@ import com.bnorm.barkeep.model.value.IngredientValueAdapter
 import com.bnorm.barkeep.model.value.RecipeValueAdapter
 import com.bnorm.barkeep.model.value.UserSpecValue
 import com.bnorm.barkeep.model.value.UserValueAdapter
+import com.bnorm.barkeep.service.db.Pool
 import com.squareup.moshi.Moshi
 import io.kotlintest.matchers.Matcher
 import io.kotlintest.matchers.Matchers
@@ -35,6 +36,7 @@ import org.testcontainers.containers.GenericContainer
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.Properties
+import javax.persistence.EntityManager
 import javax.persistence.Persistence
 
 @RunWith(SpringRunner::class)
@@ -83,7 +85,11 @@ abstract class AbstractRestServiceTest : Matchers {
 
       val factory = Persistence.createEntityManagerFactory("com.bnorm.barkeep.jpa", properties)
       val em = factory.createEntityManager()
-      val userService = DbUserService(em)
+      val emPool = object : Pool<EntityManager> {
+        override fun take(): EntityManager = em
+        override fun give(type: EntityManager) {}
+      }
+      val userService = DbUserService(emPool)
 
       val passwordEncoder = BCryptPasswordEncoder()
       userService.createUser(TEST_USER.copy(password = passwordEncoder.encode(TEST_USER.password!!)))

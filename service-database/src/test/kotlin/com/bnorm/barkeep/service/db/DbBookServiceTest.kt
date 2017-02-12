@@ -264,8 +264,8 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     @BeforeClass
     @JvmStatic
     fun setupBookService() {
-      val userService = DbUserService(em)
-      service = DbBookService(em, DbRecipeService(em, DbIngredientService(em), userService), userService)
+      val userService = DbUserService(emPool)
+      service = DbBookService(emPool, DbRecipeService(emPool, DbIngredientService(emPool), userService), userService)
 
       joeTestmore = userService.createUser(UserSpecValue(username = "joe",
                                                          password = "testmore",

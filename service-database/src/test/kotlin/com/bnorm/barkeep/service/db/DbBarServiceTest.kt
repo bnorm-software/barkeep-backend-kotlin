@@ -1,17 +1,15 @@
 // Copyright 2017 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.service.db
 
-import com.bnorm.barkeep.model.value.BarSpecValue
 import com.bnorm.barkeep.model.User
+import com.bnorm.barkeep.model.value.BarSpecValue
 import com.bnorm.barkeep.model.value.UserSpecValue
-import com.bnorm.barkeep.service.db.DbBarService
-import com.bnorm.barkeep.service.db.DbIngredientService
-import com.bnorm.barkeep.service.db.DbUserService
 import io.kotlintest.matchers.have
 import org.junit.After
 import org.junit.BeforeClass
 import org.junit.Test
 import java.io.IOException
+import javax.persistence.EntityManager
 
 class DbBarServiceTest : AbstractDbServiceTest() {
 
@@ -267,8 +265,8 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     @BeforeClass
     @JvmStatic
     fun setupBarService() {
-      val userService = DbUserService(em)
-      service = DbBarService(em, DbIngredientService(em), userService)
+      val userService = DbUserService(emPool)
+      service = DbBarService(emPool, DbIngredientService(emPool), userService)
 
       joeTestmore = userService.createUser(UserSpecValue(username = "joe",
                                                          password = "testmore",

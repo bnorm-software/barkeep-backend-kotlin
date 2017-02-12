@@ -16,6 +16,13 @@ CREATE TABLE lkpUsersBars
 );
 
 
+CREATE TABLE lkpUsersRecipes
+(
+  user   INT(10) UNSIGNED    NOT NULL,
+  recipe BIGINT(20) UNSIGNED NOT NULL
+);
+
+
 CREATE TABLE lkpBooksRecipes
 (
   book   BIGINT(20) UNSIGNED NOT NULL,
@@ -126,6 +133,20 @@ ALTER TABLE tblRecipes
   ON UPDATE CASCADE;
 CREATE INDEX FK_tblRecipes_tblUsers
   ON tblRecipes (owner);
+
+
+ALTER TABLE lkpUsersRecipes
+  ADD FOREIGN KEY (user) REFERENCES tblUsers (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+ALTER TABLE lkpUsersRecipes
+  ADD FOREIGN KEY (recipe) REFERENCES tblRecipes (id)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
+CREATE INDEX FK_lkpUsersRecipes_tblUsers
+  ON lkpUsersRecipes (user);
+CREATE INDEX FK_lkpUsersRecipes_tblRecipes
+  ON lkpUsersRecipes (recipe);
 
 
 ALTER TABLE lkpBooksRecipes

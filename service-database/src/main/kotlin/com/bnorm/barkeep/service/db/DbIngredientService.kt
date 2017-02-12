@@ -7,14 +7,20 @@ import com.bnorm.barkeep.model.db.IngredientEntity
 import com.bnorm.barkeep.service.IngredientService
 import javax.persistence.EntityManager
 
-class DbIngredientService(private val em: EntityManager) : IngredientService {
+class DbIngredientService(private val emPool: Pool<EntityManager>) : IngredientService {
 
   override fun getIngredients(): List<Ingredient> {
-    return em.createNamedQuery("IngredientEntity.findAll", IngredientEntity::class.java).resultList
+    emPool.borrow {
+    return createNamedQuery("IngredientEntity.findAll", IngredientEntity::class.java).resultList
+    }
+    return emptyList() // never used
   }
 
   fun findIngredient(id: Long): IngredientEntity? {
-    return em.find(IngredientEntity::class.java, id)
+    emPool.borrow {
+    return find(IngredientEntity::class.java, id)
+    }
+    return null // never used
   }
 
   override fun getIngredient(id: Long): IngredientEntity {
@@ -26,8 +32,8 @@ class DbIngredientService(private val em: EntityManager) : IngredientService {
     ingredient.title?.apply { ingredientEntity.title = this }
     ingredient.parent?.apply { ingredientEntity.parent = getIngredient(this.id) }
 
-    em.txn {
-      em.persist(ingredientEntity)
+    emPool.txn {
+      persist(ingredientEntity)
     }
     return ingredientEntity
   }
@@ -35,7 +41,7 @@ class DbIngredientService(private val em: EntityManager) : IngredientService {
   override fun setIngredient(id: Long, ingredient: IngredientSpec): IngredientEntity {
     val ingredientEntity = getIngredient(id)
 
-    em.txn {
+    emPool.txn {
       ingredient.title?.apply { ingredientEntity.title = this }
       ingredient.parent?.apply { ingredientEntity.parent = getIngredient(this.id) }
     }
@@ -43,8 +49,8 @@ class DbIngredientService(private val em: EntityManager) : IngredientService {
   }
 
   override fun deleteIngredient(id: Long) {
-    em.txn {
-      em.remove(getIngredient(id))
+    emPool.txn {
+      remove(getIngredient(id))
     }
   }
 }

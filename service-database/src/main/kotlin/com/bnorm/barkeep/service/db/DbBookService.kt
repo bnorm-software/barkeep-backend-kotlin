@@ -7,16 +7,22 @@ import com.bnorm.barkeep.model.db.BookEntity
 import com.bnorm.barkeep.service.BookService
 import javax.persistence.EntityManager
 
-class DbBookService(private val em: EntityManager,
+class DbBookService(private val emPool: Pool<EntityManager>,
                     private val recipeService: DbRecipeService,
                     private val userService: DbUserService) : BookService {
 
   override fun getBooks(): List<Book> {
-    return em.createNamedQuery("BookEntity.findAll", BookEntity::class.java).resultList
+    emPool.borrow {
+      return createNamedQuery("BookEntity.findAll", BookEntity::class.java).resultList
+    }
+    return emptyList() // never used
   }
 
   fun findBook(id: Long): BookEntity? {
-    return em.find(BookEntity::class.java, id)
+    emPool.borrow {
+      return find(BookEntity::class.java, id)
+    }
+    return null // never used
   }
 
   override fun getBook(id: Long): BookEntity {
@@ -33,8 +39,8 @@ class DbBookService(private val em: EntityManager,
     bookEntity.owner = userEntity
     bookEntity.addUser(userEntity)
 
-    em.txn {
-      em.persist(bookEntity)
+    emPool.txn {
+      persist(bookEntity)
       userEntity.addBook(bookEntity)
     }
     return bookEntity
@@ -44,7 +50,7 @@ class DbBookService(private val em: EntityManager,
     val bookEntity = getBook(bookId)
     val recipeEntity = recipeService.getRecipe(recipeId)
 
-    em.txn {
+    emPool.txn {
       bookEntity.addRecipe(recipeEntity)
     }
   }
@@ -53,7 +59,7 @@ class DbBookService(private val em: EntityManager,
     val bookEntity = getBook(bookId)
     val recipeEntity = recipeService.getRecipe(recipeId)
 
-    em.txn {
+    emPool.txn {
       bookEntity.removeRecipe(recipeEntity)
     }
   }
@@ -61,7 +67,7 @@ class DbBookService(private val em: EntityManager,
   override fun setBook(id: Long, book: BookSpec): BookEntity {
     val bookEntity = getBook(id)
 
-    em.txn {
+    emPool.txn {
       book.title?.apply { bookEntity.title = this }
       book.description?.apply { bookEntity.description = this }
       book.owner?.apply { bookEntity.owner = userService.getUser(this.id) }
@@ -70,8 +76,8 @@ class DbBookService(private val em: EntityManager,
   }
 
   override fun deleteBook(id: Long) {
-    em.txn {
-      em.remove(getBook(id))
+    emPool.txn {
+      remove(getBook(id))
     }
   }
 }

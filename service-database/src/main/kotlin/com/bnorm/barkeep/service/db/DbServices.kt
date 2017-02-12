@@ -5,15 +5,23 @@ import javax.persistence.EntityManager
 
 internal class Rollback : RuntimeException()
 
-internal inline fun EntityManager.txn(action: () -> Unit) {
+internal inline fun Pool<EntityManager>.txn(action: EntityManager.() -> Unit) {
+  borrow {
+    txn(action)
+  }
+}
+
+internal inline fun EntityManager.txn(action: EntityManager.() -> Unit) {
   transaction.begin()
   try {
-    action.invoke()
+    action.invoke(this)
     transaction.commit()
   } catch (t: Rollback) {
     transaction.rollback()
   } catch (t: Throwable) {
-    transaction.rollback()
+    if (transaction.isActive) {
+      transaction.rollback()
+    }
     throw t
   }
 }

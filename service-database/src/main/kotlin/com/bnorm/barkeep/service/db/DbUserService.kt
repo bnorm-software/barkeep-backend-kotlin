@@ -6,10 +6,13 @@ import com.bnorm.barkeep.model.db.UserEntity
 import com.bnorm.barkeep.service.UserService
 import javax.persistence.EntityManager
 
-class DbUserService(private val em: EntityManager) : UserService {
+class DbUserService(private val emPool: Pool<EntityManager>) : UserService {
 
   fun findUser(id: Long): UserEntity? {
-    return em.find(UserEntity::class.java, id)
+    emPool.borrow {
+      return find(UserEntity::class.java, id)
+    }
+    return null // never used
   }
 
   override fun getUser(id: Long): UserEntity {
@@ -23,8 +26,8 @@ class DbUserService(private val em: EntityManager) : UserService {
     userEntity.email = user.email
     userEntity.displayName = user.displayName
 
-    em.txn {
-      em.persist(userEntity)
+    emPool.txn {
+      persist(userEntity)
     }
     return userEntity
   }
@@ -32,7 +35,7 @@ class DbUserService(private val em: EntityManager) : UserService {
   override fun setUser(id: Long, user: UserSpec): UserEntity {
     val userEntity = getUser(id)
 
-    em.txn {
+    emPool.txn {
       user.username?.apply { userEntity.username = this }
       user.password?.apply { userEntity.password = this }
       user.email?.apply { userEntity.email = this }

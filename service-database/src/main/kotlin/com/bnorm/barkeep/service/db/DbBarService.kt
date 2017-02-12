@@ -7,16 +7,22 @@ import com.bnorm.barkeep.model.db.BarEntity
 import com.bnorm.barkeep.service.BarService
 import javax.persistence.EntityManager
 
-class DbBarService(private val em: EntityManager,
+class DbBarService(private val emPool: Pool<EntityManager>,
                    private val ingredientService: DbIngredientService,
                    private val userService: DbUserService) : BarService {
 
   override fun getBars(): List<Bar> {
-    return em.createNamedQuery("BarEntity.findAll", BarEntity::class.java).resultList
+    emPool.borrow {
+      return createNamedQuery("BarEntity.findAll", BarEntity::class.java).resultList
+    }
+    return emptyList() // never used
   }
 
   fun findBar(id: Long): BarEntity? {
-    return em.find(BarEntity::class.java, id)
+    emPool.borrow {
+      return find(BarEntity::class.java, id)
+    }
+    return null // never used
   }
 
   override fun getBar(id: Long): BarEntity {
@@ -33,18 +39,19 @@ class DbBarService(private val em: EntityManager,
     barEntity.owner = userEntity
     barEntity.addUser(userEntity)
 
-    em.txn {
-      em.persist(barEntity)
+    emPool.txn {
+      persist(barEntity)
       userEntity.addBar(barEntity)
     }
     return barEntity
+
   }
 
   override fun addBarIngredient(barId: Long, ingredientId: Long) {
     val barEntity = getBar(barId)
     val ingredientEntity = ingredientService.getIngredient(ingredientId)
 
-    em.txn {
+    emPool.txn {
       barEntity.addIngredient(ingredientEntity)
     }
   }
@@ -53,7 +60,7 @@ class DbBarService(private val em: EntityManager,
     val barEntity = getBar(barId)
     val ingredientEntity = ingredientService.getIngredient(ingredientId)
 
-    em.txn {
+    emPool.txn {
       barEntity.removeIngredient(ingredientEntity)
     }
   }
@@ -61,7 +68,7 @@ class DbBarService(private val em: EntityManager,
   override fun setBar(id: Long, bar: BarSpec): BarEntity {
     val barEntity = getBar(id)
 
-    em.txn {
+    emPool.txn {
       // todo what if we want to clear a value?
       bar.title?.apply { barEntity.title = this }
       bar.description?.apply { barEntity.description = this }
@@ -71,8 +78,8 @@ class DbBarService(private val em: EntityManager,
   }
 
   override fun deleteBar(id: Long) {
-    em.txn {
-      em.remove(getBar(id))
+    emPool.txn {
+      remove(getBar(id))
     }
   }
 }

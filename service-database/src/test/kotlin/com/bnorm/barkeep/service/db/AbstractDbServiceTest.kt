@@ -31,7 +31,7 @@ abstract class AbstractDbServiceTest : Matchers {
     }
 
     @JvmStatic
-    protected lateinit var em: EntityManager
+    protected lateinit var emPool: Pool<EntityManager>
 
     @BeforeClass
     @JvmStatic
@@ -45,7 +45,12 @@ abstract class AbstractDbServiceTest : Matchers {
       properties.put("hibernate.connection.password", "root")
 
       val factory = Persistence.createEntityManagerFactory("com.bnorm.barkeep.jpa", properties)
-      em = factory.createEntityManager()
+      val em = factory.createEntityManager()
+
+      emPool = object : Pool<EntityManager> {
+        override fun take(): EntityManager = em
+        override fun give(type: EntityManager) {}
+      }
     }
   }
 }

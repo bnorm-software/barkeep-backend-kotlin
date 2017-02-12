@@ -8,16 +8,22 @@ import com.bnorm.barkeep.model.db.RecipeEntity
 import com.bnorm.barkeep.service.RecipeService
 import javax.persistence.EntityManager
 
-class DbRecipeService(private val em: EntityManager,
+class DbRecipeService(private val emPool: Pool<EntityManager>,
                       private val ingredientService: DbIngredientService,
                       private val userService: DbUserService) : RecipeService {
 
   override fun getRecipes(): List<Recipe> {
-    return em.createNamedQuery("RecipeEntity.findAll", RecipeEntity::class.java).resultList
+    emPool.borrow {
+    return createNamedQuery("RecipeEntity.findAll", RecipeEntity::class.java).resultList
+    }
+    return emptyList() // never used
   }
 
   fun findRecipe(id: Long): RecipeEntity? {
-    return em.find(RecipeEntity::class.java, id)
+    emPool.borrow {
+      return find(RecipeEntity::class.java, id)
+    }
+    return null
   }
 
   override fun getRecipe(id: Long): RecipeEntity {
@@ -51,8 +57,8 @@ class DbRecipeService(private val em: EntityManager,
       }
     }
 
-    em.txn {
-      em.persist(recipeEntity)
+    emPool.txn {
+      persist(recipeEntity)
       userEntity.addRecipe(recipeEntity)
     }
     return recipeEntity
@@ -61,10 +67,7 @@ class DbRecipeService(private val em: EntityManager,
   override fun setRecipe(id: Long, recipe: RecipeSpec): RecipeEntity {
     val recipeEntity = getRecipe(id)
 
-    em.txn {
-      with(recipe) {
-        val recipeSpec: RecipeSpec = this
-      }
+    emPool.txn {
       recipe.title?.apply { recipeEntity.title = this }
       recipe.description?.apply { recipeEntity.description = this }
       recipe.owner?.apply { recipeEntity.owner = userService.getUser(this.id) }
@@ -88,8 +91,8 @@ class DbRecipeService(private val em: EntityManager,
   }
 
   override fun deleteRecipe(id: Long) {
-    em.txn {
-      em.remove(getRecipe(id))
+    emPool.txn {
+      remove(getRecipe(id))
     }
   }
 }

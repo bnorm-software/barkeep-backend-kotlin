@@ -1,8 +1,9 @@
 // Copyright 2017 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.service.db
 
-import io.kotlintest.matchers.Matcher
-import io.kotlintest.matchers.Matchers
+import com.google.common.truth.Subject
+import com.google.common.truth.TestVerb
+import com.google.common.truth.Truth.assert_
 import org.junit.BeforeClass
 import org.junit.ClassRule
 import org.testcontainers.containers.BindMode
@@ -11,15 +12,8 @@ import java.util.Properties
 import javax.persistence.EntityManager
 import javax.persistence.Persistence
 
-abstract class AbstractDbServiceTest : Matchers {
+abstract class AbstractDbServiceTest {
   companion object {
-    val beValid = object : Matcher<Long> {
-      override fun test(value: Long) {
-        if (value == -1L)
-          throw AssertionError("$value is not a valid ID")
-      }
-    }
-
     private val MYSQL_PORT = 3306
 
     @get:ClassRule
@@ -56,3 +50,7 @@ abstract class AbstractDbServiceTest : Matchers {
 }
 
 class DockerContainer(image: String) : GenericContainer<DockerContainer>(image)
+
+inline fun assert(block: TestVerb.() -> Unit) = assert_().block()
+
+inline fun <T, S : Subject<S, T>> all(subject: S, block: S.() -> Unit) = subject.block()

@@ -2,7 +2,6 @@
 package com.bnorm.barkeep.model.db
 
 import com.bnorm.barkeep.model.User
-import org.hibernate.annotations.SortNatural
 import java.time.LocalDateTime
 import java.util.TreeSet
 import javax.persistence.Column
@@ -15,6 +14,7 @@ import javax.persistence.ManyToMany
 import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
 import javax.persistence.OneToMany
+import javax.persistence.OrderBy
 import javax.persistence.Table
 
 @Entity
@@ -48,36 +48,36 @@ class UserEntity : User {
   private val modifyTime: LocalDateTime? = null
 
   @OneToMany(mappedBy = "owner", orphanRemoval = true)
-  @SortNatural
+  @OrderBy
   private val ownedBooks: MutableSet<BookEntity> = TreeSet()
 
   @ManyToMany
   @JoinTable(name = "lkpUsersBooks",
              joinColumns = arrayOf(JoinColumn(name = "user")),
              inverseJoinColumns = arrayOf(JoinColumn(name = "book")))
-  @SortNatural
+  @OrderBy
   override val books: MutableSet<BookEntity> = TreeSet()
 
   @OneToMany(mappedBy = "owner", orphanRemoval = true)
-  @SortNatural
+  @OrderBy
   private val ownedBars: MutableSet<BarEntity> = TreeSet()
 
   @ManyToMany
   @JoinTable(name = "lkpUsersBars",
              joinColumns = arrayOf(JoinColumn(name = "user")),
              inverseJoinColumns = arrayOf(JoinColumn(name = "bar")))
-  @SortNatural
+  @OrderBy
   override val bars: MutableSet<BarEntity> = TreeSet()
 
   @OneToMany(mappedBy = "owner", orphanRemoval = true)
-  @SortNatural
+  @OrderBy
   private val ownedRecipes: MutableSet<RecipeEntity> = TreeSet()
 
   @OneToMany
   @JoinTable(name = "lkpUsersRecipes",
              joinColumns = arrayOf(JoinColumn(name = "user")),
              inverseJoinColumns = arrayOf(JoinColumn(name = "recipe")))
-  @SortNatural
+  @OrderBy
   override val recipes: MutableSet<RecipeEntity> = TreeSet()
 
   fun addBar(barEntity: BarEntity) {

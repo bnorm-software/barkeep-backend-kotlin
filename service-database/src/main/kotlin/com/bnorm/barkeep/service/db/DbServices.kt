@@ -14,7 +14,7 @@ internal inline fun Pool<EntityManager>.txn(action: EntityManager.() -> Unit) {
 internal inline fun EntityManager.txn(action: EntityManager.() -> Unit) {
   transaction.begin()
   try {
-    action.invoke(this)
+    action(this)
     transaction.commit()
   } catch (t: Rollback) {
     transaction.rollback()

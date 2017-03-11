@@ -4,11 +4,11 @@ package com.bnorm.barkeep.service.db
 import com.bnorm.barkeep.model.User
 import com.bnorm.barkeep.model.value.RecipeSpecValue
 import com.bnorm.barkeep.model.value.UserSpecValue
-import io.kotlintest.matchers.have
 import org.junit.After
 import org.junit.BeforeClass
 import org.junit.Test
 import java.io.IOException
+import kotlin.test.assertFailsWith
 
 class DbRecipeServiceTest : AbstractDbServiceTest() {
 
@@ -35,9 +35,11 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.createRecipe(recipe)
 
     // then
-    response.id should beValid
-    response.title shouldBe "Recipe1"
-    response.description shouldBe "Description1"
+    assert {
+      that(response.id).isAtLeast(0)
+      that(response.title).isEqualTo("Recipe1")
+      that(response.description).isEqualTo("Description1")
+    }
   }
 
 
@@ -57,9 +59,11 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.getRecipe(recipe.id)
 
     // then
-    response.id shouldBe recipe.id
-    response.title shouldBe recipe.title
-    response.description shouldBe recipe.description
+    assert {
+      that(response.id).isEqualTo(recipe.id)
+      that(response.title).isEqualTo(recipe.title)
+      that(response.description).isEqualTo(recipe.description)
+    }
   }
 
   @Test
@@ -67,13 +71,17 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
   fun getRecipe_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.getRecipe(-1)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find recipe"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find recipe with id=-1")
+      }
     }
   }
 
@@ -94,9 +102,11 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.setRecipe(recipe.id, RecipeSpecValue(title = "Recipe2"))
 
     // then
-    response.id shouldBe recipe.id
-    response.title shouldBe "Recipe2"
-    response.description shouldBe recipe.description
+    assert {
+      that(response.id).isEqualTo(recipe.id)
+      that(response.title).isEqualTo("Recipe2")
+      that(response.description).isEqualTo(recipe.description)
+    }
   }
 
   @Test
@@ -111,9 +121,11 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.setRecipe(recipe.id, RecipeSpecValue(title = "Recipe2", description = "Description2"))
 
     // then
-    response.id shouldBe recipe.id
-    response.title shouldBe "Recipe2"
-    response.description shouldBe "Description2"
+    assert {
+      that(response.id).isEqualTo(recipe.id)
+      that(response.title).isEqualTo("Recipe2")
+      that(response.description).isEqualTo("Description2")
+    }
   }
 
   @Test
@@ -121,13 +133,17 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
   fun setRecipe_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.setRecipe(-1, RecipeSpecValue(title = "Recipe1", description = "Description1", owner = joeTestmore))
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find recipe"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find recipe with id=-1")
+      }
     }
   }
 
@@ -155,13 +171,17 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
   fun deleteRecipe_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.deleteRecipe(-1)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find recipe"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find recipe with id=-1")
+      }
     }
   }
 
@@ -179,7 +199,9 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.getRecipes()
 
     // then
-    response should haveSize(0)
+    assert {
+      that(response).isEmpty()
+    }
   }
 
   @Test
@@ -195,7 +217,9 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.getRecipes()
 
     // then
-    response should haveSize(0)
+    assert {
+      that(response).isEmpty()
+    }
   }
 
   @Test
@@ -210,8 +234,12 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.getRecipes()
 
     // then
-    response should haveSize(1)
-    response shouldBe listOf(recipe1)
+    assert {
+      all(that(response)) {
+        hasSize(1)
+        containsExactly(recipe1)
+      }
+    }
   }
 
   @Test
@@ -234,8 +262,12 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.getRecipes()
 
     // then
-    response should haveSize(1)
-    response shouldBe listOf(recipe2)
+    assert {
+      all(that(response)) {
+        hasSize(1)
+        containsExactly(recipe2)
+      }
+    }
   }
 
   @Test
@@ -256,8 +288,12 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.getRecipes()
 
     // then
-    response should haveSize(3)
-    response shouldBe listOf(recipe1, recipe3, recipe2)
+    assert {
+      all(that(response)) {
+        hasSize(3)
+        containsExactly(recipe1, recipe3, recipe2)
+      }
+    }
   }
 
   @Test
@@ -286,8 +322,12 @@ class DbRecipeServiceTest : AbstractDbServiceTest() {
     val response = service.getRecipes()
 
     // then
-    response should haveSize(3)
-    response shouldBe listOf(recipe5, recipe3, recipe1)
+    assert {
+      all(that(response)) {
+        hasSize(3)
+        containsExactly(recipe5, recipe3, recipe1)
+      }
+    }
   }
 
   companion object {

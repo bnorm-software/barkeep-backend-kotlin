@@ -4,11 +4,11 @@ package com.bnorm.barkeep.service.db
 import com.bnorm.barkeep.model.User
 import com.bnorm.barkeep.model.value.BookSpecValue
 import com.bnorm.barkeep.model.value.UserSpecValue
-import io.kotlintest.matchers.have
 import org.junit.After
 import org.junit.BeforeClass
 import org.junit.Test
 import java.io.IOException
+import kotlin.test.assertFailsWith
 
 class DbBookServiceTest : AbstractDbServiceTest() {
 
@@ -35,9 +35,11 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.createBook(book)
 
     // then
-    response.id should beValid
-    response.title shouldBe "Book1"
-    response.description shouldBe "Description1"
+    assert {
+      that(response.id).isAtLeast(0)
+      that(response.title).isEqualTo("Book1")
+      that(response.description).isEqualTo("Description1")
+    }
   }
 
 
@@ -55,9 +57,11 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.getBook(book.id)
 
     // then
-    response.id shouldBe book.id
-    response.title shouldBe book.title
-    response.description shouldBe book.description
+    assert {
+      that(response.id).isEqualTo(book.id)
+      that(response.title).isEqualTo(book.title)
+      that(response.description).isEqualTo(book.description)
+    }
   }
 
   @Test
@@ -65,13 +69,17 @@ class DbBookServiceTest : AbstractDbServiceTest() {
   fun getBook_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.getBook(-1)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find book"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find book with id=-1")
+      }
     }
   }
 
@@ -90,9 +98,11 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.setBook(book.id, BookSpecValue(title = "Book2"))
 
     // then
-    response.id shouldBe book.id
-    response.title shouldBe "Book2"
-    response.description shouldBe book.description
+    assert {
+      that(response.id).isEqualTo(book.id)
+      that(response.title).isEqualTo("Book2")
+      that(response.description).isEqualTo(book.description)
+    }
   }
 
   @Test
@@ -105,9 +115,11 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.setBook(book.id, BookSpecValue(title = "Book2", description = "Description2"))
 
     // then
-    response.id shouldBe book.id
-    response.title shouldBe "Book2"
-    response.description shouldBe "Description2"
+    assert {
+      that(response.id).isEqualTo(book.id)
+      that(response.title).isEqualTo("Book2")
+      that(response.description).isEqualTo("Description2")
+    }
   }
 
   @Test
@@ -115,13 +127,17 @@ class DbBookServiceTest : AbstractDbServiceTest() {
   fun setBook_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.setBook(-1, BookSpecValue(title = "Book1", description = "Description1", owner = joeTestmore))
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find book"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find book with id=-1")
+      }
     }
   }
 
@@ -147,13 +163,17 @@ class DbBookServiceTest : AbstractDbServiceTest() {
   fun deleteBook_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.deleteBook(-1)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find book"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find book with id=-1")
+      }
     }
   }
 
@@ -171,7 +191,9 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.getBooks()
 
     // then
-    response should haveSize(0)
+    assert {
+      that(response).isEmpty()
+    }
   }
 
   @Test
@@ -185,7 +207,9 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.getBooks()
 
     // then
-    response should haveSize(0)
+    assert {
+      that(response).isEmpty()
+    }
   }
 
   @Test
@@ -198,8 +222,12 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.getBooks()
 
     // then
-    response should haveSize(1)
-    response shouldBe listOf(book1)
+    assert {
+      all(that(response)) {
+        hasSize(1)
+        containsExactly(book1)
+      }
+    }
   }
 
   @Test
@@ -216,8 +244,12 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.getBooks()
 
     // then
-    response should haveSize(1)
-    response shouldBe listOf(book2)
+    assert {
+      all(that(response)) {
+        hasSize(1)
+        containsExactly(book2)
+      }
+    }
   }
 
   @Test
@@ -232,8 +264,12 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.getBooks()
 
     // then
-    response should haveSize(3)
-    response shouldBe listOf(book1, book3, book2)
+    assert {
+      all(that(response)) {
+        hasSize(3)
+        containsExactly(book1, book3, book2)
+      }
+    }
   }
 
   @Test
@@ -252,8 +288,12 @@ class DbBookServiceTest : AbstractDbServiceTest() {
     val response = service.getBooks()
 
     // then
-    response should haveSize(3)
-    response shouldBe listOf(book5, book3, book1)
+    assert {
+      all(that(response)) {
+        hasSize(3)
+        containsExactly(book5, book3, book1)
+      }
+    }
   }
 
   companion object {

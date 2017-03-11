@@ -4,12 +4,11 @@ package com.bnorm.barkeep.service.db
 import com.bnorm.barkeep.model.User
 import com.bnorm.barkeep.model.value.BarSpecValue
 import com.bnorm.barkeep.model.value.UserSpecValue
-import io.kotlintest.matchers.have
 import org.junit.After
 import org.junit.BeforeClass
 import org.junit.Test
 import java.io.IOException
-import javax.persistence.EntityManager
+import kotlin.test.assertFailsWith
 
 class DbBarServiceTest : AbstractDbServiceTest() {
 
@@ -36,9 +35,11 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.createBar(bar)
 
     // then
-    response.id should beValid
-    response.title shouldBe "Bar1"
-    response.description shouldBe "Description1"
+    assert {
+      that(response.id).isAtLeast(0)
+      that(response.title).isEqualTo("Bar1")
+      that(response.description).isEqualTo("Description1")
+    }
   }
 
 
@@ -56,9 +57,11 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.getBar(bar.id)
 
     // then
-    response.id shouldBe bar.id
-    response.title shouldBe bar.title
-    response.description shouldBe bar.description
+    assert {
+      that(response.id).isEqualTo(bar.id)
+      that(response.title).isEqualTo(bar.title)
+      that(response.description).isEqualTo(bar.description)
+    }
   }
 
   @Test
@@ -66,13 +69,17 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   fun getBar_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.getBar(-1)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find bar"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find bar with id=-1")
+      }
     }
   }
 
@@ -91,9 +98,11 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.setBar(bar.id, BarSpecValue(title = "Bar2"))
 
     // then
-    response.id shouldBe bar.id
-    response.title shouldBe "Bar2"
-    response.description shouldBe bar.description
+    assert {
+      that(response.id).isEqualTo(bar.id)
+      that(response.title).isEqualTo("Bar2")
+      that(response.description).isEqualTo(bar.description)
+    }
   }
 
   @Test
@@ -106,9 +115,11 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.setBar(bar.id, BarSpecValue(title = "Bar2", description = "Description2"))
 
     // then
-    response.id shouldBe bar.id
-    response.title shouldBe "Bar2"
-    response.description shouldBe "Description2"
+    assert {
+      that(response.id).isEqualTo(bar.id)
+      that(response.title).isEqualTo("Bar2")
+      that(response.description).isEqualTo("Description2")
+    }
   }
 
   @Test
@@ -116,13 +127,17 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   fun setBar_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.setBar(-1, BarSpecValue(title = "Bar1", description = "Description1", owner = joeTestmore))
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find bar"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find bar with id=-1")
+      }
     }
   }
 
@@ -148,13 +163,17 @@ class DbBarServiceTest : AbstractDbServiceTest() {
   fun deleteBar_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.deleteBar(-1)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find bar"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find bar with id=-1")
+      }
     }
   }
 
@@ -172,7 +191,9 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.getBars()
 
     // then
-    response should beEmpty()
+    assert {
+      that(response).isEmpty()
+    }
   }
 
   @Test
@@ -186,7 +207,9 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.getBars()
 
     // then
-    response should beEmpty()
+    assert {
+      that(response).isEmpty()
+    }
   }
 
   @Test
@@ -199,8 +222,12 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.getBars()
 
     // then
-    response should haveSize(1)
-    response shouldBe listOf(bar1)
+    assert {
+      all(that(response)) {
+        hasSize(1)
+        containsExactly(bar1)
+      }
+    }
   }
 
   @Test
@@ -217,8 +244,12 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.getBars()
 
     // then
-    response should haveSize(1)
-    response shouldBe listOf(bar2)
+    assert {
+      all(that(response)) {
+        hasSize(1)
+        containsExactly(bar2)
+      }
+    }
   }
 
   @Test
@@ -233,8 +264,12 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.getBars()
 
     // then
-    response should haveSize(3)
-    response shouldBe listOf(bar1, bar3, bar2)
+    assert {
+      all(that(response)) {
+        hasSize(3)
+        containsExactly(bar1, bar3, bar2)
+      }
+    }
   }
 
   @Test
@@ -253,8 +288,12 @@ class DbBarServiceTest : AbstractDbServiceTest() {
     val response = service.getBars()
 
     // then
-    response should haveSize(3)
-    response shouldBe listOf(bar5, bar3, bar1)
+    assert {
+      all(that(response)) {
+        hasSize(3)
+        containsExactly(bar5, bar3, bar1)
+      }
+    }
   }
 
   companion object {

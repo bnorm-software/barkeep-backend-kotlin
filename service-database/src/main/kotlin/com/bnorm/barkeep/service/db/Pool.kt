@@ -12,7 +12,7 @@ interface Pool<T> {
 inline fun <T> Pool<T>.borrow(action: T.() -> Unit) {
   val t = take()
   try {
-    action.invoke(t)
+    action(t)
   } finally {
     give(t)
   }

@@ -1,9 +1,7 @@
 // Copyright 2017 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.service.rest
 
-import com.bnorm.barkeep.model.Bar
 import com.bnorm.barkeep.model.value.BarSpecValue
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Test
 import java.io.IOException
@@ -35,11 +33,13 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.createBar(bar).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id should beValid
-    response.body().title shouldBe bar.title
-    response.body().description shouldBe bar.description
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body().id).isAtLeast(0)
+      that(response.body().title).isEqualTo(bar.title)
+      that(response.body().description).isEqualTo(bar.description)
+    }
   }
 
 
@@ -57,11 +57,13 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.getBar(bar.id).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id shouldBe bar.id
-    response.body().title shouldBe bar.title
-    response.body().description shouldBe bar.description
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body().id).isAtLeast(bar.id)
+      that(response.body().title).isEqualTo(bar.title)
+      that(response.body().description).isEqualTo(bar.description)
+    }
   }
 
   @Test
@@ -73,8 +75,10 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.getBar(-1).execute()
 
     // then
-    assertThat(response.isSuccessful()).isFalse()
-    assertThat(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    assert {
+      that(response.isSuccessful).isFalse()
+      that(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    }
   }
 
 
@@ -92,11 +96,13 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.updateBar(bar.id, BarSpecValue(title = "Bar2")).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id shouldBe bar.id
-    response.body().title shouldBe "Bar2"
-    response.body().description shouldBe bar.description
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body().id).isAtLeast(bar.id)
+      that(response.body().title).isEqualTo("Bar2")
+      that(response.body().description).isEqualTo(bar.description)
+    }
   }
 
   @Test
@@ -109,11 +115,13 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.updateBar(bar.id, BarSpecValue(title = "Bar2", description = "Description2")).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id shouldBe bar.id
-    response.body().title shouldBe "Bar2"
-    response.body().description shouldBe "Description2"
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body().id).isAtLeast(bar.id)
+      that(response.body().title).isEqualTo("Bar2")
+      that(response.body().description).isEqualTo("Description2")
+    }
   }
 
   @Test
@@ -125,8 +133,10 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.updateBar(-1, BarSpecValue(title = "Bar1", description = "Description1")).execute()
 
     // then
-    assertThat(response.isSuccessful()).isFalse()
-    assertThat(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    assert {
+      that(response.isSuccessful).isFalse()
+      that(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    }
   }
 
 
@@ -144,8 +154,10 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.deleteBar(bar.id).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+    }
   }
 
   @Test
@@ -157,8 +169,10 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.deleteBar(-1).execute()
 
     // then
-    assertThat(response.isSuccessful()).isFalse()
-    assertThat(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    assert {
+      that(response.isSuccessful).isFalse()
+      that(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    }
   }
 
 
@@ -175,9 +189,11 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.getBars().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Bar>(response.body()).isEmpty()
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).isEmpty()
+    }
   }
 
   @Test
@@ -191,9 +207,11 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.getBars().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Bar>(response.body()).isEmpty()
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).isEmpty()
+    }
   }
 
   @Test
@@ -206,10 +224,12 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.getBars().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Bar>(response.body()).hasSize(1)
-    assertThat<Bar>(response.body()).containsExactly(bar1)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).hasSize(1)
+      that(response.body()).containsExactly(bar1)
+    }
   }
 
   @Test
@@ -226,10 +246,12 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.getBars().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Bar>(response.body()).hasSize(1)
-    assertThat<Bar>(response.body()).containsExactly(bar2)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).hasSize(1)
+      that(response.body()).containsExactly(bar2)
+    }
   }
 
   @Test
@@ -244,10 +266,12 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.getBars().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Bar>(response.body()).hasSize(3)
-    assertThat<Bar>(response.body()).containsExactly(bar1, bar3, bar2)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).hasSize(3)
+      that(response.body()).containsExactly(bar1, bar3, bar2)
+    }
   }
 
   @Test
@@ -266,9 +290,11 @@ class RestBarServiceTest : AbstractRestServiceTest() {
     val response = service.getBars().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Bar>(response.body()).hasSize(3)
-    assertThat<Bar>(response.body()).containsExactly(bar5, bar3, bar1)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).hasSize(3)
+      that(response.body()).containsExactly(bar5, bar3, bar1)
+    }
   }
 }

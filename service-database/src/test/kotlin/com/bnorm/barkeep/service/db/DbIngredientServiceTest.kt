@@ -4,11 +4,11 @@ package com.bnorm.barkeep.service.db
 import com.bnorm.barkeep.model.User
 import com.bnorm.barkeep.model.value.IngredientSpecValue
 import com.bnorm.barkeep.model.value.UserSpecValue
-import io.kotlintest.matchers.have
 import org.junit.After
 import org.junit.BeforeClass
 import org.junit.Test
 import java.io.IOException
+import kotlin.test.assertFailsWith
 
 class DbIngredientServiceTest : AbstractDbServiceTest() {
 
@@ -35,8 +35,10 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.createIngredient(ingredient)
 
     // then
-    response.id should beValid
-    response.title shouldBe "Ingredient1"
+    assert {
+      that(response.id).isAtLeast(0)
+      that(response.title).isEqualTo("Ingredient1")
+    }
   }
 
 
@@ -54,8 +56,10 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.getIngredient(ingredient.id)
 
     // then
-    response.id shouldBe ingredient.id
-    response.title shouldBe ingredient.title
+    assert {
+      that(response.id).isEqualTo(ingredient.id)
+      that(response.title).isEqualTo(ingredient.title)
+    }
   }
 
   @Test
@@ -63,13 +67,17 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
   fun getIngredient_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.getIngredient(-1)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find ingredient"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find ingredient with id=-1")
+      }
     }
   }
 
@@ -88,8 +96,10 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.setIngredient(ingredient.id, IngredientSpecValue(title = "Ingredient2"))
 
     // then
-    response.id shouldBe ingredient.id
-    response.title shouldBe "Ingredient2"
+    assert {
+      that(response.id).isEqualTo(ingredient.id)
+      that(response.title).isEqualTo("Ingredient2")
+    }
   }
 
   @Test
@@ -102,8 +112,10 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.setIngredient(ingredient.id, IngredientSpecValue(title = "Ingredient2"))
 
     // then
-    response.id shouldBe ingredient.id
-    response.title shouldBe "Ingredient2"
+    assert {
+      that(response.id).isEqualTo(ingredient.id)
+      that(response.title).isEqualTo("Ingredient2")
+    }
   }
 
   @Test
@@ -111,13 +123,17 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
   fun setIngredient_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.setIngredient(-1, IngredientSpecValue(title = "Ingredient1"))
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find ingredient"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find ingredient with id=-1")
+      }
     }
   }
 
@@ -143,13 +159,17 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
   fun deleteIngredient_failure_badId() {
     // given
 
-    try {
-      // when
+    // when
+    val e: IllegalArgumentException = assertFailsWith {
       service.deleteIngredient(-1)
-      fail("Did not fail as expected")
-    } catch (e: IllegalArgumentException) {
-      // then
-      e.message!! should have substring "Cannot find ingredient"
+    }
+
+    // then
+    assert {
+      all(that(e)) {
+        isInstanceOf(IllegalArgumentException::class.java)
+        hasMessage("Cannot find ingredient with id=-1")
+      }
     }
   }
 
@@ -167,7 +187,9 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.getIngredients()
 
     // then
-    response should haveSize(0)
+    assert {
+      that(response).isEmpty()
+    }
   }
 
   @Test
@@ -181,7 +203,9 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.getIngredients()
 
     // then
-    response should haveSize(0)
+    assert {
+      that(response).isEmpty()
+    }
   }
 
   @Test
@@ -194,8 +218,12 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.getIngredients()
 
     // then
-    response should haveSize(1)
-    response shouldBe listOf(ingredient1)
+    assert {
+      all(that(response)) {
+        hasSize(1)
+        containsExactly(ingredient1)
+      }
+    }
   }
 
   @Test
@@ -212,8 +240,12 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.getIngredients()
 
     // then
-    response should haveSize(1)
-    response shouldBe listOf(ingredient2)
+    assert {
+      all(that(response)) {
+        hasSize(1)
+        containsExactly(ingredient2)
+      }
+    }
   }
 
   @Test
@@ -228,8 +260,12 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.getIngredients()
 
     // then
-    response should haveSize(3)
-    response shouldBe listOf(ingredient1, ingredient3, ingredient2)
+    assert {
+      all(that(response)) {
+        hasSize(3)
+        containsExactly(ingredient1, ingredient3, ingredient2)
+      }
+    }
   }
 
   @Test
@@ -248,8 +284,12 @@ class DbIngredientServiceTest : AbstractDbServiceTest() {
     val response = service.getIngredients()
 
     // then
-    response should haveSize(3)
-    response shouldBe listOf(ingredient5, ingredient3, ingredient1)
+    assert {
+      all(that(response)) {
+        hasSize(3)
+        containsExactly(ingredient5, ingredient3, ingredient1)
+      }
+    }
   }
 
   companion object {

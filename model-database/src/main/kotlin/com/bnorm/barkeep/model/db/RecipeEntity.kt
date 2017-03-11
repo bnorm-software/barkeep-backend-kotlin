@@ -2,7 +2,6 @@
 package com.bnorm.barkeep.model.db
 
 import com.bnorm.barkeep.model.Recipe
-import org.hibernate.annotations.SortNatural
 import java.time.LocalDateTime
 import java.util.TreeSet
 import javax.persistence.CollectionTable
@@ -16,6 +15,7 @@ import javax.persistence.ManyToMany
 import javax.persistence.ManyToOne
 import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
+import javax.persistence.OrderBy
 import javax.persistence.PreRemove
 import javax.persistence.Table
 
@@ -56,15 +56,15 @@ class RecipeEntity : Recipe {
 
   @ElementCollection
   @CollectionTable(name = "tblRecipeComponents", joinColumns = arrayOf(JoinColumn(name = "recipe")))
-  @SortNatural
+  @OrderBy
   override val components: MutableSet<ComponentEntity> = TreeSet()
 
   @ManyToMany(mappedBy = "recipes")
-  @SortNatural
+  @OrderBy
   private val users: MutableSet<UserEntity> = TreeSet()
 
   @ManyToMany(mappedBy = "recipes")
-  @SortNatural
+  @OrderBy
   private val books: MutableSet<BookEntity> = TreeSet()
 
   @PreRemove

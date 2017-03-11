@@ -1,9 +1,7 @@
 // Copyright 2017 (C) BNORM Software. All rights reserved.
 package com.bnorm.barkeep.service.rest
 
-import com.bnorm.barkeep.model.Book
 import com.bnorm.barkeep.model.value.BookSpecValue
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Test
 import java.io.IOException
@@ -35,11 +33,13 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.createBook(book).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id should beValid
-    response.body().title shouldBe book.title
-    response.body().description shouldBe book.description
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body().id).isAtLeast(0)
+      that(response.body().title).isEqualTo(book.title)
+      that(response.body().description).isEqualTo(book.description)
+    }
   }
 
 
@@ -57,11 +57,13 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.getBook(book.id).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id shouldBe book.id
-    response.body().title shouldBe book.title
-    response.body().description shouldBe book.description
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body().id).isAtLeast(book.id)
+      that(response.body().title).isEqualTo(book.title)
+      that(response.body().description).isEqualTo(book.description)
+    }
   }
 
   @Test
@@ -73,8 +75,10 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.getBook(-1).execute()
 
     // then
-    assertThat(response.isSuccessful()).isFalse()
-    assertThat(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    assert {
+      that(response.isSuccessful).isFalse()
+      that(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    }
   }
 
 
@@ -92,11 +96,13 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.updateBook(book.id, BookSpecValue(title = "Book2")).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id shouldBe book.id
-    response.body().title shouldBe "Book2"
-    response.body().description shouldBe book.description
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body().id).isAtLeast(book.id)
+      that(response.body().title).isEqualTo("Book2")
+      that(response.body().description).isEqualTo(book.description)
+    }
   }
 
   @Test
@@ -109,11 +115,13 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.updateBook(book.id, BookSpecValue(title = "Book2", description = "Description2")).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    response.body().id shouldBe book.id
-    response.body().title shouldBe "Book2"
-    response.body().description shouldBe "Description2"
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body().id).isAtLeast(book.id)
+      that(response.body().title).isEqualTo("Book2")
+      that(response.body().description).isEqualTo("Description2")
+    }
   }
 
   @Test
@@ -125,8 +133,10 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.updateBook(-1, BookSpecValue(title = "Book1", description = "Description1")).execute()
 
     // then
-    assertThat(response.isSuccessful()).isFalse()
-    assertThat(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    assert {
+      that(response.isSuccessful).isFalse()
+      that(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    }
   }
 
 
@@ -144,8 +154,10 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.deleteBook(book.id).execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+    }
   }
 
   @Test
@@ -157,8 +169,10 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.deleteBook(-1).execute()
 
     // then
-    assertThat(response.isSuccessful()).isFalse()
-    assertThat(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    assert {
+      that(response.isSuccessful).isFalse()
+      that(response.raw().code()).isEqualTo(CODE_NOT_FOUND)
+    }
   }
 
 
@@ -175,9 +189,11 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.getBooks().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Book>(response.body()).isEmpty()
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).isEmpty()
+    }
   }
 
   @Test
@@ -191,9 +207,11 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.getBooks().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Book>(response.body()).isEmpty()
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).isEmpty()
+    }
   }
 
   @Test
@@ -206,10 +224,12 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.getBooks().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Book>(response.body()).hasSize(1)
-    assertThat<Book>(response.body()).containsExactly(book)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).hasSize(1)
+      that(response.body()).containsExactly(book)
+    }
   }
 
   @Test
@@ -226,10 +246,12 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.getBooks().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Book>(response.body()).hasSize(1)
-    assertThat<Book>(response.body()).containsExactly(book2)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).hasSize(1)
+      that(response.body()).containsExactly(book2)
+    }
   }
 
   @Test
@@ -244,10 +266,12 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.getBooks().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Book>(response.body()).hasSize(3)
-    assertThat<Book>(response.body()).containsExactly(book1, book3, book2)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).hasSize(3)
+      that(response.body()).containsExactly(book1, book3, book2)
+    }
   }
 
   @Test
@@ -266,9 +290,11 @@ class RestBookServiceTest : AbstractRestServiceTest() {
     val response = service.getBooks().execute()
 
     // then
-    assertThat(response.isSuccessful()).isTrue()
-    assertThat(response.raw().code()).isEqualTo(CODE_SUCCESS)
-    assertThat<Book>(response.body()).hasSize(3)
-    assertThat<Book>(response.body()).containsExactly(book5, book3, book1)
+    assert {
+      that(response.isSuccessful).isTrue()
+      that(response.raw().code()).isEqualTo(CODE_SUCCESS)
+      that(response.body()).hasSize(3)
+      that(response.body()).containsExactly(book5, book3, book1)
+    }
   }
 }

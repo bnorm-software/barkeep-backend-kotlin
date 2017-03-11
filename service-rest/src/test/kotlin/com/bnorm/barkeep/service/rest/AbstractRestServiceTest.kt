@@ -2,7 +2,6 @@
 package com.bnorm.barkeep.service.rest
 
 import com.bnorm.barkeep.RestApplication
-import com.bnorm.barkeep.service.db.DbUserService
 import com.bnorm.barkeep.model.value.BarValueAdapter
 import com.bnorm.barkeep.model.value.BookValueAdapter
 import com.bnorm.barkeep.model.value.ComponentValueAdapter
@@ -10,10 +9,12 @@ import com.bnorm.barkeep.model.value.IngredientValueAdapter
 import com.bnorm.barkeep.model.value.RecipeValueAdapter
 import com.bnorm.barkeep.model.value.UserSpecValue
 import com.bnorm.barkeep.model.value.UserValueAdapter
+import com.bnorm.barkeep.service.db.DbUserService
 import com.bnorm.barkeep.service.db.Pool
+import com.google.common.truth.Subject
+import com.google.common.truth.TestVerb
+import com.google.common.truth.Truth
 import com.squareup.moshi.Moshi
-import io.kotlintest.matchers.Matcher
-import io.kotlintest.matchers.Matchers
 import okhttp3.Authenticator
 import okhttp3.Credentials
 import okhttp3.HttpUrl
@@ -44,15 +45,8 @@ import javax.persistence.Persistence
 @ContextConfiguration(classes = arrayOf(RestApplication::class),
                       initializers = arrayOf(AbstractRestServiceTest.Initializer::class))
 @DirtiesContext // forces a reload of app for every test - required because database is reloaded
-abstract class AbstractRestServiceTest : Matchers {
+abstract class AbstractRestServiceTest {
   companion object {
-    val beValid = object : Matcher<Long> {
-      override fun test(value: Long) {
-        if (value == -1L)
-          throw AssertionError("$value is not a valid ID")
-      }
-    }
-
     private val MYSQL_PORT = 3306
 
     @get:ClassRule
@@ -129,14 +123,14 @@ abstract class AbstractRestServiceTest : Matchers {
     val url = urlBuilder.build()
 
 
-    val authenticator = Authenticator { route, response ->
+    val authenticator = Authenticator { _, response ->
       response.request()
               .newBuilder()
               .header("Authorization", Credentials.basic(TEST_USER.username, TEST_USER.password))
               .build()
     }
     val client = OkHttpClient.Builder().addInterceptor(CookieInterceptor(url))
-             .addInterceptor(WireTraceInterceptor())
+            .addInterceptor(WireTraceInterceptor())
             .authenticator(authenticator)
             .build()
     val moshi = Moshi.Builder()
@@ -157,3 +151,7 @@ abstract class AbstractRestServiceTest : Matchers {
 }
 
 class DockerContainer(image: String) : GenericContainer<DockerContainer>(image)
+
+inline fun assert(block: TestVerb.() -> Unit) = Truth.assert_().block()
+
+inline fun <T, S : Subject<S, T>> all(subject: S, block: S.() -> Unit) = subject.block()

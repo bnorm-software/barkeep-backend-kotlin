@@ -2,7 +2,6 @@
 package com.bnorm.barkeep.model.db
 
 import com.bnorm.barkeep.model.Bar
-import org.hibernate.annotations.SortNatural
 import java.time.LocalDateTime
 import java.util.TreeSet
 import javax.persistence.Column
@@ -15,6 +14,7 @@ import javax.persistence.ManyToMany
 import javax.persistence.ManyToOne
 import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
+import javax.persistence.OrderBy
 import javax.persistence.PreRemove
 import javax.persistence.Table
 
@@ -45,14 +45,14 @@ class BarEntity : Bar {
   private val modifyTime: LocalDateTime? = null
 
   @ManyToMany(mappedBy = "bars")
-  @SortNatural
+  @OrderBy
   private val users: MutableSet<UserEntity> = TreeSet()
 
   @ManyToMany
   @JoinTable(name = "lkpBarsIngredients",
              joinColumns = arrayOf(JoinColumn(name = "bar")),
              inverseJoinColumns = arrayOf(JoinColumn(name = "ingredient")))
-  @SortNatural
+  @OrderBy
   override var ingredients: MutableSet<IngredientEntity> = TreeSet()
 
   @PreRemove
